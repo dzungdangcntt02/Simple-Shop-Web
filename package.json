@@ -12,6 +12,10 @@
   "type": "module",
   "keywords": ["restapi", "nodejs", "expressjs", "backend"],
   "author": "David Dzung Dang",
+  "repository": { 
+    "type": "git", 
+    "url": "git+https://github.com/ddbdzung/Simple-Shop-Web.git" 
+  },
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
