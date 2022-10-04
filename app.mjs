@@ -41,9 +41,6 @@ app.use(helmet())
 // Sanitize request data like $ . characters
 app.use(mongoSanitize())
 
-// Set public folder of server: ./src/public
-// app.use(express.static(path.join(__dirname, 'src', 'public')))
-
 // Only accept json data
 app.use(express.json())
 
