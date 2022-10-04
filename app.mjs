@@ -17,6 +17,7 @@ import {
 
 import ApiError from './src/helpers/ApiError.mjs'
 import {
+  authLimiter,
   defaultLimiter,
   errorConverter as centralErrorConverter,
   errorHandler as centralErrorHandler
@@ -49,6 +50,8 @@ app.use(express.urlencoded({ extended: true }))
 
 // Apply rate limiter API by default
 app.use(defaultLimiter)
+
+app.use('/api/v1/auth', authLimiter)
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
