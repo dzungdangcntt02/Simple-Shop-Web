@@ -3,7 +3,18 @@ import app from './app.mjs'
 import logger from './src/config/logger.mjs'
 import { getCurrentDateTime } from './src/helpers/dateToolkit.mjs'
 
-const port = process.env.PORT || 2703
+// Config database go here
+// Default is MongoDB
+const databaseName = process.env.DB_NAME || 'default'
+// Set up your uri connection to MongoDB, default is standalone
+const uri = `mongodb://localhost:27017/${databaseName}`
+// Set up your options to MongoDB, default is below
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}
+
+const port = +process.env.PORT || 2703
 let server
 const serverErrorHandler = (error) => {
   logger.error(`Error: ${error.message}`)
@@ -12,17 +23,6 @@ const serverErrorHandler = (error) => {
   } else {
     process.exit(1)
   }
-}
-
-// Config database go here
-// Default is MongoDB
-const databaseName = process.env?.DB_NAME || 'default'
-// Set up your uri connection to MongoDB, default is standalone
-const uri = `mongodb://localhost:27017/${databaseName}`
-// Set up your options to MongoDB, default is below
-const options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
 }
 
 // Async code go here
@@ -44,4 +44,10 @@ process.on('uncaughtException', serverErrorHandler)
 // Clean up process after server closed
 process.on('exit', () => {
   logger.info('Server closed')
+})
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received')
+  if (server) {
+    server.close()
+  }
 })
