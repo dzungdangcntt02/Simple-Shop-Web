@@ -1,1 +1,2 @@
-export * as User from './user.model.mjs'
+export { User } from './user.model.mjs'
+export { Role } from './role.model.mjs'

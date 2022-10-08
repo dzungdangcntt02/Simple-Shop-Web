@@ -1,16 +1,35 @@
 import morgan, { token } from 'morgan'
+import rfs from 'rotating-file-stream'
+
+import path, { dirname } from 'path'
+import { fileURLToPath } from 'url'
+
+import logger from './logger.mjs'
+import { config } from '../validations/index.mjs'
+import { getHighResDateTime } from '../helpers/dateToolkit.mjs'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+// eslint-disable-next-line no-unused-vars
+const generator = (_time, _index) => `${getHighResDateTime()}.log`
 
 let stream
-if (process.env.NODE_ENV === 'production') {
-  stream = await import('./rtf.mjs')
+// Create stream thread
+if (config.nodeEnv === 'production') {
+  stream = rfs.createStream(generator, {
+    size: '10M', // rotate every 10 MegaBytes written
+    interval: '1d', // rotate daily
+    path: path.join(__dirname, '..', 'logs'),
+  })
+} else if (config.nodeEnv === 'development') {
+  stream = { write: (message) => logger.info(message.trim()) }
 }
-
 // Get error message
 token('message', (req, res) => res.locals.errorMessage || '')
 // Get user id if exists
 token('userId', (req, res) => res.locals.user || '')
 
-const getIpFormat = () => (process.env.NODE_ENV === 'production' ? ':remote-addr - ' : '')
+const getIpFormat = () => (config.nodeEnv === 'production' ? ':remote-addr - ' : '')
 const successResponseFormat = `:userId & ${getIpFormat()}:method :url :status & :response-time ms`
 const errorResponseFormat = `:userId & ${getIpFormat()}:method :url :status & :response-time ms & message: :message`
 

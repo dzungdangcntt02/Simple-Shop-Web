@@ -1,45 +1,46 @@
 import httpStatus from 'http-status'
 
-import response from '../helpers/response.mjs'
+import response from '../helpers/resolvedResponse.mjs'
 import catchAsync from '../helpers/catchAsync.mjs'
-import { userService } from '../services/index.mjs'
+import pick from '../helpers/pick.mjs'
+import { authService, tokenService, userService } from '../services/index.mjs'
+import { default as sanitize } from '../helpers/sanitizeDocument.mjs'
+import { errorResponseSpecification } from '../helpers/errorResponse.mjs'
 
-const register = catchAsync(async (req, res) => {
-  const { email, password, username } = req.body
-  if (!username || !email || !password) {
-    return res.status(httpStatus.BAD_REQUEST)
-      .send(response(httpStatus.BAD_REQUEST, httpStatus[400]))
-  }
-
+export const register = catchAsync(async (req, res) => {
+  const doc = pick(req.body, ['username', 'email', 'password'])
   try {
-    // Promise.resolve() to disable ts(80007) false positive
-    const isEmailExisted = await Promise.resolve(userService.isEmailTaken(email))
-    if (isEmailExisted) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .send(response(httpStatus.BAD_REQUEST, 'Email already taken'))
-    }
+    const user = await userService.createUser(doc)
+    const sanitizedUser = sanitize(user, 0)
 
-    const user = await userService.createUser({
-      username,
-      email,
-      password,
+    const tokens = tokenService.generateAuthTokens(sanitizedUser)
+
+    response(res, httpStatus.CREATED, httpStatus[201], {
+      tokens,
+      user: sanitizedUser,
     })
-    if (!user) {
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR, httpStatus[500])
-    }
-
-    const token = 'token_kjw3lnawekj'
-    return res.status(httpStatus.CREATED)
-      .send(response(httpStatus.CREATED, httpStatus[201], {
-        user,
-        token,
-      }))
   } catch (e) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR, httpStatus[500])
+    errorResponseSpecification(e, res, [httpStatus.BAD_REQUEST])
   }
 })
 
-export {
-  // eslint-disable-next-line import/prefer-default-export
-  register,
-}
+export const login = catchAsync(async (req, res) => {
+  const { email, password } = req.body
+  try {
+    const user = await authService.loginWithEmailAndPassword(email, password)
+    const tokens = tokenService.generateAuthTokens(user)
+
+    response(res, httpStatus.OK, httpStatus[200], {
+      user,
+      tokens,
+    })
+  } catch (e) {
+    errorResponseSpecification(e, res, [httpStatus.UNAUTHORIZED])
+  }
+})
+
+export const test = catchAsync(async (req, res) => {
+  response(res, httpStatus.OK, httpStatus[200], {
+    user: req.user,
+  })
+})
