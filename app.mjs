@@ -1,18 +1,17 @@
-import { __DIRNAME, path, statusCode } from './src/constants/index.mjs'
-
-// Assign path to environment file
-if (process.env.NODE_ENV === 'development') {
-  let dotenv = await import('dotenv')
-  dotenv.config({ path: path.join(__DIRNAME, 'config', '.env') })
-}
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import mongoSanitize from 'express-mongo-sanitize'
+import httpStatus from 'http-status'
+
+import { config as configVars } from './src/validations/index.mjs'
+import routes from './src/routes/v1/index.mjs'
 import {
   errorHandler,
-  successHandler
+  successHandler,
 } from './src/config/morgan.mjs'
 
 import ApiError from './src/helpers/ApiError.mjs'
@@ -20,8 +19,17 @@ import {
   authLimiter,
   defaultLimiter,
   errorConverter as centralErrorConverter,
-  errorHandler as centralErrorHandler
+  errorHandler as centralErrorHandler,
 } from './src/middlewares/index.mjs'
+
+// Get current dirname
+const __dirname = dirname(fileURLToPath(import.meta.url))
+// Assign path to environment file
+if (configVars.nodeEnv === 'development') {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const { config } = await import('dotenv')
+  config({ path: join(__dirname, '.env') })
+}
 
 // Init express app
 const app = express()
@@ -48,14 +56,18 @@ app.use(express.json())
 // Parse data with URL-encoded like JSON
 app.use(express.urlencoded({ extended: true }))
 
-// Apply rate limiter API by default
-app.use(defaultLimiter)
+if (process.env.NODE_ENV === 'production') {
+  // Apply rate limiter API by default
+  app.use(defaultLimiter)
+  // Apply rate limiter API to auth feature in order for security
+  app.use('/api/v1/auth', authLimiter)
+}
 
-app.use('/api/v1/auth', authLimiter)
+app.use('/api/v1', routes)
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiError(statusCode.NOT_FOUND, 'Not found'));
+  next(new ApiError(httpStatus.NOT_FOUND, httpStatus[404]));
 });
 
 // convert error to ApiError, if needed
