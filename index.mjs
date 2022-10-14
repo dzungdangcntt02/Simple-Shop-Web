@@ -21,8 +21,7 @@ const port = +process.env.PORT || 2703
 let server
 
 const serverErrorHandler = (error) => {
-  logger.error(`${error}`)
-  logger.error(`${error.message}`)
+  logger.error(error)
   if (server) {
     server.close()
   } else {

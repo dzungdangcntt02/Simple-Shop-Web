@@ -32,11 +32,11 @@ export const generateAuthTokens = user => {
   return {
     access: {
       token: accessToken,
-      expires: accessTokenExpires, // Duration expires
+      expiresIn: accessTokenExpires, // Duration expires
     },
     refresh: {
       token: refreshToken,
-      expires: refreshTokenExpires, // Duration expires
+      expiresIn: refreshTokenExpires, // Duration expires
     },
   }
 }

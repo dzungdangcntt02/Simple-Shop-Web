@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker/locale/vi'
 
 import app from '../../app.mjs'
 import setupTestDB from '../helpers/connectDb.mjs'
-import User from '../../src/models/index.mjs'
+import { User } from '../../src/models/user.model.mjs'
 import { insertUsers, userOne } from '../fixtures/user.fixture.mjs'
 import { api } from '../../src/constants/index.mjs'
 
@@ -62,11 +62,11 @@ describe('Auth routes', () => {
       expect(res.body.data.tokens).toEqual({
         access: {
           token: expect.anything(),
-          expires: expect.anything(),
+          expiresIn: expect.anything(),
         },
         refresh: {
           token: expect.anything(),
-          expires: expect.anything(),
+          expiresIn: expect.anything(),
         },
       })
     })
@@ -88,7 +88,6 @@ describe('Auth routes', () => {
   // Test log-in API
   describe(`POST ${API_V1}${AUTH}/${LOGIN}`, () => {
     it('should return 200 and successfully validate user info', async () => {
-      // Add userOne to testDB
       await insertUsers([userOne])
       // Login form with verified info
       const loginCredentials = {
@@ -108,11 +107,11 @@ describe('Auth routes', () => {
       expect(res.body.data.tokens).toEqual({
         access: {
           token: expect.anything(),
-          expires: expect.anything(),
+          expiresIn: expect.anything(),
         },
         refresh: {
           token: expect.anything(),
-          expires: expect.anything(),
+          expiresIn: expect.anything(),
         }
       })
     })

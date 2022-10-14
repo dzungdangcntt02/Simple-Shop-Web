@@ -9,3 +9,5 @@ export const SUB_AUTH = {
   TEST: 'test',
 }
 export const USER = '/user'
+
+export const DOCS = '/docs'
