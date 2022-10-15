@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import { faker } from '@faker-js/faker/locale/vi'
 import slugify from 'slugify'
 
-import User from '../../src/models/index.mjs'
+import { User } from '../../src/models/index.mjs'
 import { userService } from '../../src/services/index.mjs'
 
 const password = 'password123!@#'

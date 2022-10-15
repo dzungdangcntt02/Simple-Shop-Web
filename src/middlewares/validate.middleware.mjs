@@ -3,6 +3,8 @@ import httpStatus from 'http-status'
 
 import pick from '../helpers/pick.mjs'
 import ApiError from '../helpers/ApiError.mjs'
+import { config } from '../validations/index.mjs'
+import logger from '../config/logger.mjs'
 
 // eslint-disable-next-line import/prefer-default-export
 export const validate = (schema) => (req, res, next) => {
@@ -16,7 +18,9 @@ export const validate = (schema) => (req, res, next) => {
 
   if (error) {
     const errorMessage = error.details.map((details) => details.message).join(', ')
-    return next(new ApiError(httpStatus.BAD_REQUEST, errorMessage))
+    if (config.nodeEnv === 'development') logger.warn(errorMessage)
+
+    return next(new ApiError(httpStatus.BAD_REQUEST, httpStatus[400]))
   }
   Object.assign(req, value)
   return next()
