@@ -40,13 +40,28 @@ export const generateAuthTokens = user => {
     },
   }
 }
+/**
+ * @Returns {string} a validate account token
+ */
+export const generateValAccToken = userId => generateToken({ id: userId }, config.validateAccountTokenKey, {
+  expiresIn: config.validateAccountTokenLife * 60,
+})
 
-export const verifyToken = (token, keyType = 'access') => {
+/**
+ * Return decoded payload or throw API error when token is invalid
+ * @param {string} token
+ * @param {string} keyType 'access' | 'refresh' | 'validateAccount'
+ * @param {string} msg custom message throw when token is invalid
+ * @returns {object|error}
+ */
+export const verifyToken = (token, keyType = 'access', msg = undefined) => {
   let key
   if (keyType === 'access') {
     key = config.accessTokenKey
   } else if (keyType === 'refresh') {
     key = config.refreshTokenKey
+  } else if (keyType === 'validateAccount') {
+    key = config.validateAccountTokenKey
   } else {
     throw new Error('Type error! Key must be one of \'access\' or \'refresh\'')
   }
@@ -56,6 +71,6 @@ export const verifyToken = (token, keyType = 'access') => {
     return decodedPayload
   } catch (e) {
     // Invalid token: malformed token
-    throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+    throw new ApiError(httpStatus.UNAUTHORIZED, msg || httpStatus[401])
   }
 }
