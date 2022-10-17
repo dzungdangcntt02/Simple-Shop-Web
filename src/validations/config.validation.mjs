@@ -20,11 +20,13 @@ const envVarsSchema = Joi.object()
     JWT_ACCESS_TOKEN_KEY: Joi.string().required().description('JWT access token key'),
     JWT_REFRESH_TOKEN_KEY: Joi.string().required().description('JWT refresh token key'),
     JWT_VALIDATE_ACCOUNT_TOKEN_KEY: Joi.string().required().description('JWT validate account token key'),
-    SMTP_HOST: Joi.string().description('server that will send the emails'),
-    SMTP_PORT: Joi.number().description('port to connect to the email server'),
-    SMTP_USERNAME: Joi.string().description('username for email server'),
-    SMTP_PASSWORD: Joi.string().description('password for email server'),
+    DEV_SMTP_HOST: Joi.string().description('server that will send the emails'),
+    DEV_SMTP_PORT: Joi.number().description('port to connect to the email server'),
+    DEV_SMTP_USERNAME: Joi.string().description('username for email server'),
+    DEV_SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
+    PROD_MAIL_USERNAME: Joi.string().description('username for email server'),
+    PROD_MAIL_PASSWORD: Joi.string().description('password for email server'),
   })
   .unknown()
 
@@ -45,14 +47,25 @@ export const dbName = envVars.DB_NAME
 export const nodeEnv = envVars.NODE_ENV
 export const port = envVars.PORT
 export const host = envVars.HOST
-export const email = {
-  smtp: {
-    host: envVars.SMTP_HOST,
-    port: envVars.SMTP_PORT,
-    auth: {
-      user: envVars.SMTP_USERNAME,
-      pass: envVars.SMTP_PASSWORD,
+export const email = (nodeEnv === 'development' || nodeEnv === 'test')
+  ? {
+    smtp: {
+      host: envVars.DEV_SMTP_HOST,
+      port: envVars.DEV_SMTP_PORT,
+      auth: {
+        user: envVars.DEV_SMTP_USERNAME,
+        pass: envVars.DEV_SMTP_PASSWORD,
+      },
     },
-  },
-  from: envVars.EMAIL_FROM,
-}
+    from: envVars.DEV_EMAIL_FROM,
+  }
+  : {
+    smtp: {
+      service: 'Gmail',
+      auth: {
+        user: envVars.PROD_MAIL_USERNAME,
+        pass: envVars.PROD_MAIL_PASSWORD,
+      },
+    },
+    from: envVars.EMAIL_FROM,
+  }
