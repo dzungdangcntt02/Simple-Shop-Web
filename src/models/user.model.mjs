@@ -30,6 +30,10 @@ const userSchema = mongoose.Schema({
     default: 'inactive',
     enum: Object.values(status),
   },
+  // Created when user validates account, prevent user from spamming many requests
+  activateToken: {
+    type: String,
+  },
   address: {
     type: String,
     minLength: [30, 'Address must be longer than 30 characters'],

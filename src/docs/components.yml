@@ -81,3 +81,9 @@ components:
             code: 401
             message: Unauthorized
             data: []
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

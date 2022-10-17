@@ -3,9 +3,10 @@ export const AUTH = '/auth'
 export const SUB_AUTH = {
   REGISTER: 'register',
   LOGIN: 'sign-in',
-  FORGETPASSWORD: 'forget-password',
-  RESETPASSWORD: 'reset-password',
-  REFRESHTOKEN: 'refresh-token',
+  VALIDATE_EMAIL: 'confirm-email',
+  FORGET_PASSWORD: 'forget-password',
+  RESET_PASSWORD: 'reset-password',
+  REFRESH_TOKEN: 'refresh-token',
   TEST: 'test',
 }
 export const USER = '/user'

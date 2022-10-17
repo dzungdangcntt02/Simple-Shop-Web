@@ -16,3 +16,15 @@ export const login = {
     password: Joi.string().required(),
   }),
 }
+
+export const confirmEmail = {
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+  }),
+}
+
+export const confirmAccount = {
+  params: Joi.object().keys({
+    token: Joi.string().required(),
+  }),
+}

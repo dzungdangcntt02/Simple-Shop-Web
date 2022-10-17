@@ -1,7 +1,7 @@
 /* eslint-disable */
 import mongoose from 'mongoose'
 
-const dbname = process.env.DB_NAME || 'testDB'
+const dbname = 'testDB'
 const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
