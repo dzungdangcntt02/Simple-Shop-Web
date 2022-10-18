@@ -2,10 +2,6 @@
 import request from 'supertest'
 import slugify from 'slugify'
 import { faker } from '@faker-js/faker/locale/vi'
-// TODO Remove jest from import here if not in used
-import { jest } from '@jest/globals'
-// TODO Remove delay from npm if not in used
-// import delay from 'delay'
 import app from '../../app.mjs'
 import setupTestDB from '../helpers/connectDb.mjs'
 import { User } from '../../src/models/user.model.mjs'
