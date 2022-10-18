@@ -11,7 +11,9 @@ import { tokenService } from '../../src/services/index.mjs'
 
 const { SUB_AUTH, AUTH, API_V1 } = api
 const { REGISTER, LOGIN, VALIDATE_EMAIL } = SUB_AUTH
+
 setupTestDB()
+
 describe('Auth routes', () => {
 
   // Test register API
@@ -83,6 +85,7 @@ describe('Auth routes', () => {
       expect(res.statusCode).toBe(400)
     })
   })
+
   // Test log-in API
   describe(`POST ${API_V1}${AUTH}/${LOGIN}`, () => {
     it('should return 200 and successfully validate user info', async () => {
