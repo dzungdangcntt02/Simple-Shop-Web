@@ -13,7 +13,7 @@ const usernameTwo = faker.internet.userName()
 const usernameThree = faker.internet.userName()
 const adminName = faker.internet.userName()
 
-const userOne = {
+export const userOne = {
   password,
   _id: mongoose.Types.ObjectId(),
   username: usernameOne,
@@ -24,7 +24,7 @@ const userOne = {
 }
 
 
-const userTwo = {
+export const userTwo = {
   password,
   _id: mongoose.Types.ObjectId(),
   username: usernameTwo,
@@ -34,7 +34,7 @@ const userTwo = {
   slug: slugify(usernameTwo, { lower: true }),
 }
 
-const userThree = {
+export const userThree = {
   password,
   _id: mongoose.Types.ObjectId(),
   username: usernameThree,
@@ -44,7 +44,7 @@ const userThree = {
   slug: slugify(usernameThree, { lower: true }),
 }
 
-const admin = {
+export const admin = {
   password,
   _id: mongoose.Types.ObjectId(),
   username: adminName,
@@ -57,14 +57,6 @@ const admin = {
 /**
  * @param {array<object>} users 
  */
-const insertUsers = async users => {
+export const insertUsers = async users => {
   await User.insertMany(users.map(user => ({ ...user, password: hashedPassword })))
-}
-
-export {
-  userOne,
-  userTwo,
-  userThree,
-  admin,
-  insertUsers,
 }
