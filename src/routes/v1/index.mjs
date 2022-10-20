@@ -7,7 +7,7 @@ import docsEndpoint from './docs.route.mjs'
 
 const router = express.Router()
 
-const defaultRoutes = [
+const publicRoutes = [
   {
     path: api.AUTH,
     route: authEndpoint,
@@ -21,7 +21,7 @@ const devRoutes = [
   },
 ]
 
-defaultRoutes.forEach(route => {
+publicRoutes.forEach(route => {
   router.use(route.path, route.route)
 })
 
