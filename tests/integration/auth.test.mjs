@@ -9,15 +9,15 @@ import { insertUsers, userOne } from '../fixtures/user.fixture.mjs'
 import { api, status } from '../../src/constants/index.mjs'
 import { tokenService } from '../../src/services/index.mjs'
 
-const { SUB_AUTH, AUTH, API_V1 } = api
-const { REGISTER, LOGIN, VALIDATE_EMAIL } = SUB_AUTH
+const { ENDPOINTS, V1 } = api
+const { REGISTER, LOGIN, VALIDATE_EMAIL, BASE } = ENDPOINTS.AUTH
 
 setupTestDB()
 
 describe('Auth routes', () => {
 
   // Test register API
-  describe(`POST ${API_V1}${AUTH}/${REGISTER}`, () => {
+  describe(`POST ${V1}/${BASE}/${REGISTER}`, () => {
     let newUser
     let sluggedUsername
     // Create mock user
@@ -31,13 +31,13 @@ describe('Auth routes', () => {
     })
 
     it('should return 400 bad request since not contains email, password, username', async () => {
-      const res1 = await request(app).post(`${API_V1}${AUTH}/${REGISTER}`)
+      const res1 = await request(app).post(`${V1}/${BASE}/${REGISTER}`)
       expect(res1.statusCode).toBe(400)
     })
 
     // Although expect a lot but only handle one message based on output api
     it('should return 201 and successfully register user if request data is ok', async () => {
-      const res = await request(app).post(`${API_V1}${AUTH}/${REGISTER}`).send(newUser)
+      const res = await request(app).post(`${V1}/${BASE}/${REGISTER}`).send(newUser)
       expect(res.statusCode).toBe(201)
       expect(res.body.data.user).not.toHaveProperty('password')
       expect(res.body.data.user).toEqual({
@@ -74,20 +74,20 @@ describe('Auth routes', () => {
 
     it('should return 400 error if email is invalid', async () => {
       newUser.email = 'invalidEmail'
-      const res = await request(app).post(`${API_V1}${AUTH}/${REGISTER}`).send(newUser)
+      const res = await request(app).post(`${V1}/${BASE}/${REGISTER}`).send(newUser)
       expect(res.statusCode).toBe(400)
     })
 
     it('should return 400 error if email is already existed', async () => {
       await insertUsers([userOne])
       newUser.email = userOne.email
-      const res = await request(app).post(`${API_V1}${AUTH}/${REGISTER}`).send(newUser)
+      const res = await request(app).post(`${V1}/${BASE}/${REGISTER}`).send(newUser)
       expect(res.statusCode).toBe(400)
     })
   })
 
   // Test log-in API
-  describe(`POST ${API_V1}${AUTH}/${LOGIN}`, () => {
+  describe(`POST ${V1}/${BASE}/${LOGIN}`, () => {
     it('should return 200 and successfully validate user info', async () => {
       await insertUsers([userOne])
       // Login form with verified info
@@ -95,7 +95,7 @@ describe('Auth routes', () => {
         email: userOne.email,
         password: userOne.password,
       }
-      const res = await request(app).post(`${API_V1}${AUTH}/${LOGIN}`).send(loginCredentials)
+      const res = await request(app).post(`${V1}/${BASE}/${LOGIN}`).send(loginCredentials)
       expect(res.statusCode).toBe(200)
       expect(res.body.data.user).toEqual({
         id: expect.anything(),
@@ -118,7 +118,7 @@ describe('Auth routes', () => {
     })
 
     it('should return 400 bad request that email required and password required', async () => {
-      const res = await request(app).post(`${API_V1}${AUTH}/${LOGIN}`).send({
+      const res = await request(app).post(`${V1}/${BASE}/${LOGIN}`).send({
         email: '',
         password: '',
       })
@@ -126,7 +126,7 @@ describe('Auth routes', () => {
     })
 
     it('should return 401 if there are no users with that email', async () => {
-      const res = await request(app).post(`${API_V1}${AUTH}/${LOGIN}`).send({
+      const res = await request(app).post(`${V1}/${BASE}/${LOGIN}`).send({
         email: 'wrong email',
         password: userOne.password,
       })
@@ -134,7 +134,7 @@ describe('Auth routes', () => {
     })
 
     it('should return 401 error if password is wrong', async () => {
-      const res = await request(app).post(`${API_V1}${AUTH}/${LOGIN}`).send({
+      const res = await request(app).post(`${V1}/${BASE}/${LOGIN}`).send({
         email: userOne.email,
         password: 'wrong password',
       })
@@ -144,7 +144,7 @@ describe('Auth routes', () => {
   })
 
   // Test validate email API
-  describe(`POST ${API_V1}${AUTH}/${VALIDATE_EMAIL}`, () => {
+  describe(`POST ${V1}/${BASE}/${VALIDATE_EMAIL}`, () => {
 
     let inactiveUser
     beforeEach(async () => {
@@ -160,13 +160,13 @@ describe('Auth routes', () => {
     })
 
     it('should return 200 if email sent', async () => {
-      const res = await request(app).post(`${API_V1}${AUTH}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
+      const res = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
       expect(res.statusCode).toBe(200)
     })
 
     it('should return 204 if email already exist in mailbox', async () => {
-      await request(app).post(`${API_V1}${AUTH}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
-      const nextRes = await request(app).post(`${API_V1}${AUTH}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
+      await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
+      const nextRes = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
       expect(nextRes.statusCode).toBe(204)
     })
 
@@ -176,23 +176,23 @@ describe('Auth routes', () => {
     // })
 
     it('should return 400 if email is not a valid email', async () => {
-      const res = await request(app).post(`${API_V1}${AUTH}/${VALIDATE_EMAIL}`).send({ email: 'invalid email' })
+      const res = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: 'invalid email' })
       expect(res.statusCode).toBe(400)
     })
 
     it('should return 400 if email not exists', async () => {
-      const res = await request(app).post(`${API_V1}${AUTH}/${VALIDATE_EMAIL}`).send({ email: 'fakemail@gmail.com' })
+      const res = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: 'fakemail@gmail.com' })
       expect(res.statusCode).toBe(400)
     })
 
     it('should return 403 if user is already active or banned', async () => {
       const user = await User.findOneAndUpdate({ email: inactiveUser.email }, { status: status.ACTIVE })
 
-      const res1 = await request(app).post(`${API_V1}${AUTH}/${VALIDATE_EMAIL}`).send({ email: user.email })
+      const res1 = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: user.email })
       expect(res1.statusCode).toBe(403)
 
       await User.updateOne({ id: user._id }, { status: status.BANNED })
-      const res2 = await request(app).post(`${API_V1}${AUTH}/${VALIDATE_EMAIL}`).send({ email: user.email })
+      const res2 = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: user.email })
       expect(res2.statusCode).toBe(403)
     })
 
@@ -225,7 +225,7 @@ describe('Auth routes', () => {
     })
 
     it('should return 200 if status of user is inactive, token existed and valid', async () => {
-      const res = await request(app).get(`/api/v1/auth/${VALIDATE_EMAIL}/t=${activateToken}`)
+      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
       expect(res.statusCode).toBe(200)
     })
 
@@ -235,33 +235,33 @@ describe('Auth routes', () => {
     // })
 
     it('should return 401 if token is malformed', async () => {
-      const res = await request(app).get(`/api/v1/auth/${VALIDATE_EMAIL}/t=malformed_token`)
+      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=malformed_token`)
       expect(res.statusCode).toBe(401)
     })
 
     it('should return 403 if token not exists', async () => {
       user.activateToken = undefined
       await user.save()
-      const res = await request(app).get(`/api/v1/auth/${VALIDATE_EMAIL}/t=${activateToken}`)
+      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
       expect(res.statusCode).toBe(403)
     })
 
     it('should return 403 if status user is active', async () => {
       user.status = status.ACTIVE
       await user.save()
-      const res = await request(app).get(`/api/v1/auth/${VALIDATE_EMAIL}/t=${activateToken}`)
+      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
       expect(res.statusCode).toBe(403)
     })
 
     it('should return 403 if status user is banned', async () => {
       user.status = status.BANNED
       await user.save()
-      const res = await request(app).get(`/api/v1/auth/${VALIDATE_EMAIL}/t=${activateToken}`)
+      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
       expect(res.statusCode).toBe(403)
     })
 
     it('should return 404 if token is not provided in URL', async () => {
-      const res = await request(app).get(`/api/v1/auth/${VALIDATE_EMAIL}/t=`)
+      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=`)
       expect(res.statusCode).toBe(404)
     })
 

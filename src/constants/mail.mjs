@@ -1,7 +1,7 @@
-import { API_V1, AUTH, SUB_AUTH } from './api.mjs'
+import { V1, ENDPOINTS } from './api.mjs'
 import { config } from '../validations/index.mjs'
 
-const validateURL = token => `http://${config.host}:${config.port}${API_V1}${AUTH}/${SUB_AUTH.VALIDATE_EMAIL}/t=${token}`
+const validateURL = token => `http://${config.host}:${config.port}${V1}${ENDPOINTS.AUTH.BASE}/${ENDPOINTS.AUTH.VALIDATE_EMAIL}/t=${token}`
 
 // eslint-disable-next-line import/prefer-default-export
 export const verifyAccount = url => ({
