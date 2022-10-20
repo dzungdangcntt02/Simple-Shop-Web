@@ -9,14 +9,14 @@ const router = express.Router()
 
 const publicRoutes = [
   {
-    path: api.AUTH,
+    path: `/${api.ENDPOINTS.AUTH.BASE}`,
     route: authEndpoint,
   },
 ]
 
 const devRoutes = [
   {
-    path: api.DOCS,
+    path: `/${api.ENDPOINTS.AUTH.DOCS}`,
     route: docsEndpoint,
   },
 ]

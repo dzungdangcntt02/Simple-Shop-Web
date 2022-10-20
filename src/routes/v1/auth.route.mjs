@@ -12,7 +12,7 @@ const {
   REGISTER,
   TEST,
   VALIDATE_EMAIL,
-} = api.SUB_AUTH
+} = api.ENDPOINTS.AUTH
 
 const router = express.Router()
 router.post(`/${REGISTER}`, validate(auth.register), authController.register)

@@ -4,16 +4,16 @@ import confirmEmail from './confirmEmail.mjs'
 import confirmAccount from './confirmAccount.mjs'
 
 export default {
-  '/api/register': {
+  '/api/v1/register': {
     ...register,
   },
-  '/api/sign-in': {
+  '/api/v1/sign-in': {
     ...signIn,
   },
-  '/api/confirm-email': {
+  '/api/v1/confirm-email': {
     ...confirmEmail,
   },
-  '/api/confirm-email/t={token}': {
+  '/api/v1/confirm-email/t={token}': {
     ...confirmAccount,
   },
 }
