@@ -62,6 +62,8 @@ export const verifyToken = (token, keyType = 'access', msg = undefined) => {
     key = config.refreshTokenKey
   } else if (keyType === 'validateAccount') {
     key = config.validateAccountTokenKey
+  } else if (keyType === 'default') {
+    key = config.defaultTokenKey
   } else {
     throw new Error('Type error! Key must be one of \'access\' or \'refresh\'')
   }

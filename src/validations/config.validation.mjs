@@ -20,6 +20,7 @@ const envVarsSchema = Joi.object()
     JWT_ACCESS_TOKEN_KEY: Joi.string().required().description('JWT access token key'),
     JWT_REFRESH_TOKEN_KEY: Joi.string().required().description('JWT refresh token key'),
     JWT_VALIDATE_ACCOUNT_TOKEN_KEY: Joi.string().required().description('JWT validate account token key'),
+    JWT_DEFAULT_TOKEN_KEY: Joi.string().required().description('JWT default token key'),
     DEV_SMTP_HOST: Joi.string().description('server that will send the emails'),
     DEV_SMTP_PORT: Joi.number().description('port to connect to the email server'),
     DEV_SMTP_USERNAME: Joi.string().description('username for email server'),
@@ -41,6 +42,7 @@ export const accessTokenKey = envVars.JWT_ACCESS_TOKEN_KEY
 export const refreshTokenKey = envVars.JWT_REFRESH_TOKEN_KEY
 export const validateAccountTokenKey = envVars.JWT_VALIDATE_ACCOUNT_TOKEN_KEY
 export const validateAccountTokenLife = envVars.JWT_VALIDATE_ACCOUNT_TOKEN_LIFE
+export const defaultTokenKey = envVars.JWT_DEFAULT_TOKEN_KEY
 export const mailKeyAPI = envVars.SENDGRID_API_KEY
 export const mailSender = envVars.SENDGRID_SENDER
 export const dbName = envVars.DB_NAME

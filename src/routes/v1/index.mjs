@@ -16,7 +16,7 @@ const publicRoutes = [
 
 const devRoutes = [
   {
-    path: `/${api.ENDPOINTS.AUTH.DOCS}`,
+    path: `/${api.ENDPOINTS.DOCS.BASE}`,
     route: docsEndpoint,
   },
 ]

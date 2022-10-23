@@ -8,7 +8,7 @@
     "stop": "pm2 kill",
     "dev": "cross-env NODE_ENV=development nodemon index.mjs",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:watch": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --watchAll ",
+    "test:watch": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --watchAll",
     "test:mix": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules --testPathIgnorePatterns=/tests/unit/ jest",
     "test:mix:watch": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules --testPathIgnorePatterns=/tests/unit/ jest --watchAll",
     "test:unit": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest tests/unit/",

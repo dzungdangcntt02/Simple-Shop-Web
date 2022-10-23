@@ -28,3 +28,19 @@ export const confirmAccount = {
     token: Joi.string().required(),
   }),
 }
+
+export const findAccount = {
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+  }),
+}
+
+export const sendResetPwMail = {
+  // params: Joi.object().keys({
+  //   secureToken: Joi.string().required(),
+  // }),
+  body: Joi.object().keys({
+    token: Joi.string().required(),
+    option: Joi.string().required().valid('byEmail', 'byPhoneNumber'),
+  }),
+}

@@ -1,5 +1,6 @@
 import httpStatus from 'http-status'
 
+import { getRandomArbitrary } from '../common/generateOTP.mjs'
 import response from '../helpers/resolvedResponse.mjs'
 import catchAsync from '../helpers/catchAsync.mjs'
 import pick from '../helpers/pick.mjs'
@@ -11,8 +12,9 @@ import {
 } from '../services/index.mjs'
 import sanitize from '../helpers/sanitizeDocument.mjs'
 import { errorResponseSpecification } from '../helpers/errorResponse.mjs'
-import { verifyAccount, status } from '../constants/index.mjs'
+import { verifyAccount, status, resetPw } from '../constants/index.mjs'
 import ApiError from '../helpers/ApiError.mjs'
+import { config } from '../validations/index.mjs'
 
 export const register = catchAsync(async (req, res) => {
   const doc = pick(req.body, ['username', 'email', 'password'])
@@ -115,6 +117,45 @@ export const confirmAccount = catchAsync(async (req, res) => {
     response(res, httpStatus.OK, httpStatus[200])
   } catch (err) {
     errorResponseSpecification(err, res, [httpStatus.UNAUTHORIZED, httpStatus.FORBIDDEN])
+  }
+})
+
+export const findAccount = catchAsync(async (req, res) => {
+  const { email } = req.body
+  const user = await userService.getUserByEmail(email)
+  if (!user || user.status === status.INACTIVE) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+  }
+
+  // eslint-disable-next-line max-len
+  const token = tokenService.generateToken({ sub: user._id }, config.defaultTokenKey, { expiresIn: 5 * 60 }) // Expires in 5 mins
+  user.findAccountToken = token
+  await user.save()
+
+  response(res, httpStatus.OK, httpStatus[200], { token })
+})
+
+export const sendResetPwMail = catchAsync(async (req, res) => {
+  const { token } = req.body
+  // Temporary not using sending code OTP by phone number
+  try {
+    const { sub } = tokenService.verifyToken(token, 'default')
+    const user = await userService.getUserById(sub)
+    if (!user || !user.findAccountToken || user.findAccountToken !== token) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+    }
+
+    // Generate code here
+    const otp = getRandomArbitrary()
+    user.resetPwCode = otp
+    user.resetPwIssued = Date.now()
+
+    await user.save()
+    await emailService.sendEmail(user.email, resetPw(otp))
+
+    response(res, httpStatus.OK, httpStatus[200])
+  } catch (err) {
+    errorResponseSpecification(err, res, [httpStatus.UNAUTHORIZED])
   }
 })
 
