@@ -1,9 +1,7 @@
 export default {
   post: {
     summary: 'Register as user',
-    tags: [
-      'Auth',
-    ],
+    tags: ['Auth CRUD operations'],
     requestBody: {
       required: true,
       content: {

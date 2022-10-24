@@ -22,6 +22,12 @@ export const Error = {
   },
 }
 
+export const Token = {
+  type: 'string',
+  description: 'An token with sub payload contains id',
+  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8',
+}
+
 export const ResponseError = {
   type: 'object',
   properties: {

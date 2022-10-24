@@ -1,6 +1,6 @@
 export default {
   post: {
-    summary: 'Send email to verify user',
+    summary: 'Find user to send reset password email',
     tags: ['Auth CRUD operations'],
     requestBody: {
       required: true,
@@ -27,43 +27,21 @@ export default {
     },
     responses: {
       200: {
-        description: 'Send email successfully',
+        description: 'Success to find user, send token to client',
         content: {
           'application/json': {
             example: {
               code: 200,
-              message: 'Email sent',
-              data: [],
-            },
-          },
-        },
-      },
-      201: {
-        description: 'Resend email successfully',
-        content: {
-          'application/json': {
-            example: {
-              code: 201,
-              message: 'New email sent',
-              data: [],
-            },
-          },
-        },
-      },
-      204: {
-        description: 'Email already exists in mailbox with valid token',
-        content: {
-          'application/json': {
-            example: {
-              code: 204,
-              message: 'Email already exist. Check mailbox',
-              data: [],
+              message: 'OK',
+              data: {
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8',
+              },
             },
           },
         },
       },
       400: {
-        description: 'Email not exists',
+        description: 'User not exist',
         content: {
           'application/json': {
             example: {
@@ -74,13 +52,13 @@ export default {
           },
         },
       },
-      403: {
-        description: 'Can not activate active or banned account',
+      401: {
+        description: 'User account is inactive',
         content: {
           'application/json': {
             example: {
-              code: 403,
-              message: 'Forbidden',
+              code: 401,
+              message: 'Unauthorized',
               data: [],
             },
           },

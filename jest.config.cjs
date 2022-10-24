@@ -12,5 +12,5 @@ module.exports = {
     '<rootDir>/tests/helpers/',
     '<rootDir>/tests/fixtures/',
   ],
-  // testTimeout: 30000,
+  testTimeout: 30000,
 };

@@ -6,6 +6,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import mongoSanitize from 'express-mongo-sanitize'
 import httpStatus from 'http-status'
+import compression from 'compression'
 
 import { config as configVars } from './src/validations/index.mjs'
 import routes from './src/routes/v1/index.mjs'
@@ -44,6 +45,9 @@ if (process.env.NODE_ENV !== 'test') {
 // Allow CORS across-the-board
 app.use(cors())
 
+// gzip compression
+app.use(compression());
+
 // Secure app with various HTTP headers across-the-board
 app.use(helmet())
 
@@ -56,14 +60,14 @@ app.use(express.json())
 // Parse data with URL-encoded like JSON
 app.use(express.urlencoded({ extended: true }))
 
+app.use('/api/v1', routes)
+
 if (process.env.NODE_ENV === 'production') {
   // Apply rate limiter API by default
   app.use(defaultLimiter)
   // Apply rate limiter API to auth feature in order for security
   app.use('/api/v1/auth', authLimiter)
 }
-
-app.use('/api/v1', routes)
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {

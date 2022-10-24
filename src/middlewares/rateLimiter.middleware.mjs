@@ -1,7 +1,7 @@
 import rateLimit from 'express-rate-limit'
 
 /**
- * Limit each IP to 15 requests per 15 mins
+ * Limit each IP to 100 requests per 15 mins
  */
 const defaultLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins
@@ -11,7 +11,7 @@ const defaultLimiter = rateLimit({
 })
 
 /**
- * Limit each IP to 20 requests per 15 mins
+ * Limit each IP to 50 requests per 15 mins
  */
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins

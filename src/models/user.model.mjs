@@ -21,6 +21,28 @@ const userSchema = mongoose.Schema({
     minLength: [8, 'Password must be at least 8 characters'],
     private: true,
   },
+  // Used in find account API to send reset pw code by email
+  findAccountToken: {
+    type: String,
+  },
+  resetPwCode: {
+    type: String,
+    length: [6, 'reset password code length must be 6'],
+  },
+  resetPwToken: {
+    type: String,
+  },
+  // Unit time: milisecond
+  resetPwIssued: {
+    type: String,
+  },
+  // number of request send to server, to limit bruteforce reset password
+  resetPwRate: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: [5, 'limit max requests'],
+  },
   // username: Dang Duc Bao Dzung => slug: Dang-Duc-Bao-Dung
   slug: {
     type: String,
@@ -30,7 +52,7 @@ const userSchema = mongoose.Schema({
     default: 'inactive',
     enum: Object.values(status),
   },
-  // Created when user validates account, prevent user from spamming many requests
+  // Created when user validates account
   activateToken: {
     type: String,
   },

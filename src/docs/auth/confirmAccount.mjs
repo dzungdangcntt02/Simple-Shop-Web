@@ -1,9 +1,7 @@
 export default {
   get: {
     summary: 'Verify user by token',
-    tags: [
-      'Auth',
-    ],
+    tags: ['Auth CRUD operations'],
     description: 'Confirm user by token',
     parameters: [
       {
