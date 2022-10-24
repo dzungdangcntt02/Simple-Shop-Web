@@ -1,6 +1,6 @@
 export default {
   post: {
-    summary: 'Find user to send reset password email',
+    summary: 'Check reset password code',
     tags: ['Auth CRUD operations'],
     requestBody: {
       required: true,
@@ -9,17 +9,23 @@ export default {
           schema: {
             type: 'object',
             required: [
-              'email',
+              'token',
+              'secureCode',
             ],
             properties: {
-              email: {
+              token: {
                 type: 'string',
-                format: 'email',
-                description: 'must be unique',
+                description: 'token to validate whether reset password request of user is valid or not',
+              },
+              secureCode: {
+                type: 'string',
+                pattern: '/^[0-9]{6}$/',
+                description: 'secure code to validate whether reset password request of user is valid or not',
               },
             },
             example: {
-              email: 'fake@example.com',
+              token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8',
+              secureCode: '123456',
             },
           },
         },
@@ -27,7 +33,7 @@ export default {
     },
     responses: {
       200: {
-        description: 'Success to find user, send token to client',
+        description: 'Success to send email or resend email',
         content: {
           'application/json': {
             example: {
@@ -41,24 +47,36 @@ export default {
         },
       },
       400: {
-        description: 'User not exist',
+        description: 'Token or secureCode not found',
         content: {
           'application/json': {
             example: {
               code: 400,
-              message: 'Email not exists',
+              message: 'Bad request',
               data: [],
             },
           },
         },
       },
       401: {
-        description: 'User account is inactive',
+        description: 'User not exist or token expired or code not match',
         content: {
           'application/json': {
             example: {
               code: 401,
               message: 'Unauthorized',
+              data: [],
+            },
+          },
+        },
+      },
+      403: {
+        description: 'Reach limit request or spam correct code',
+        content: {
+          'application/json': {
+            example: {
+              code: 403,
+              message: 'Forbidden',
               data: [],
             },
           },

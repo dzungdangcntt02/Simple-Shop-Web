@@ -4,6 +4,8 @@ import confirmEmail from './confirmEmail.mjs'
 import confirmAccount from './confirmAccount.mjs'
 import findAccount from './findAccount.mjs'
 import resetpwEmail from './resetpwEmail.mjs'
+import confirmPwCode from './confirmPwCode.mjs'
+import resetPw from './resetPw.mjs'
 
 export default {
   '/api/v1/register': {
@@ -23,5 +25,11 @@ export default {
   },
   '/api/v1/resetpw-email': {
     ...resetpwEmail,
+  },
+  '/api/v1/confirm-pwcode': {
+    ...confirmPwCode,
+  },
+  '/api/v1/reset-pw': {
+    ...resetPw,
   },
 }

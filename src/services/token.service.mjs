@@ -50,7 +50,7 @@ export const generateValAccToken = userId => generateToken({ id: userId }, confi
 /**
  * Return decoded payload or throw API error when token is invalid
  * @param {string} token
- * @param {string} keyType 'access' | 'refresh' | 'validateAccount'
+ * @param {string} keyType 'access' | 'refresh' | 'validateAccount' | 'default' | 'client' | 'secure'
  * @param {string} msg custom message throw when token is invalid
  * @returns {object|error}
  */
@@ -64,6 +64,10 @@ export const verifyToken = (token, keyType = 'access', msg = undefined) => {
     key = config.validateAccountTokenKey
   } else if (keyType === 'default') {
     key = config.defaultTokenKey
+  } else if (keyType === 'client') {
+    key = config.clientRPTokenKey
+  } else if (keyType === 'secure') {
+    key = config.secureTokenKey
   } else {
     throw new Error('Type error! Key must be one of \'access\' or \'refresh\'')
   }

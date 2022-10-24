@@ -1,0 +1,30 @@
+NODE_ENV=development
+PORT=
+DB_NAME=
+
+JWT_ACCESS_TOKEN_KEY=
+JWT_REFRESH_TOKEN_KEY=
+JWT_VALIDATE_ACCOUNT_TOKEN_KEY=
+JWT_VALIDATE_ACCOUNT_TOKEN_LIFE=
+JWT_ACCESS_TOKEN_LIFE=
+JWT_DEFAULT_TOKEN_KEY=
+
+# SMTP configuration options for the email service
+
+# For testing, you can use a fake SMTP service like Ethereal: https://ethereal.email/create
+
+DEV_SMTP_HOST=
+DEV_SMTP_PORT=
+DEV_SMTP_USERNAME=
+DEV_SMTP_PASSWORD=
+
+EMAIL_FROM=
+
+# For production
+
+PROD_MAIL_USERNAME=
+PROD_MAIL_PASSWORD=
+
+# Client token
+
+CLIENT_JWT_RESET_PW_TOKEN=

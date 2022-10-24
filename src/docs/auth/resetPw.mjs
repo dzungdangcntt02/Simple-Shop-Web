@@ -1,6 +1,6 @@
 export default {
   post: {
-    summary: 'Find user to send reset password email',
+    summary: 'Reset password of user by token',
     tags: ['Auth CRUD operations'],
     requestBody: {
       required: true,
@@ -9,17 +9,22 @@ export default {
           schema: {
             type: 'object',
             required: [
-              'email',
+              'token',
+              'resetPassword',
             ],
             properties: {
-              email: {
+              token: {
                 type: 'string',
-                format: 'email',
-                description: 'must be unique',
+                description: 'token to validate whether reset password request of user is valid or not',
+              },
+              resetPassword: {
+                type: 'string',
+                description: 'new password',
               },
             },
             example: {
-              email: 'fake@example.com',
+              token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8',
+              resetPassword: 'newpassword123!',
             },
           },
         },
@@ -27,33 +32,31 @@ export default {
     },
     responses: {
       200: {
-        description: 'Success to find user, send token to client',
+        description: 'Success to reset password',
         content: {
           'application/json': {
             example: {
               code: 200,
               message: 'OK',
-              data: {
-                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8',
-              },
+              data: [],
             },
           },
         },
       },
       400: {
-        description: 'User not exist',
+        description: 'Token or reset password not found',
         content: {
           'application/json': {
             example: {
               code: 400,
-              message: 'Email not exists',
+              message: 'Bad request',
               data: [],
             },
           },
         },
       },
       401: {
-        description: 'User account is inactive',
+        description: 'User not exist or token invalid',
         content: {
           'application/json': {
             example: {

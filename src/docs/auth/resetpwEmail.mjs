@@ -1,9 +1,7 @@
 export default {
   post: {
-    summary: 'Send reset password code by email to user\' mail box',
-    tags: [
-      'Auth',
-    ],
+    summary: 'Send reset password code by email to user\'s mail box',
+    tags: ['Auth CRUD operations'],
     requestBody: {
       required: true,
       content: {
@@ -41,7 +39,9 @@ export default {
             example: {
               code: 200,
               message: 'OK',
-              data: [],
+              data: {
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8',
+              },
             },
           },
         },
