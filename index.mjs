@@ -10,7 +10,12 @@ import { Role, User } from './src/models/index.mjs'
 // Default is MongoDB
 const databaseName = process.env.DB_NAME || 'default'
 // Set up your uri connection to MongoDB, default is standalone
-const uri = `mongodb://localhost:27017/${databaseName}`
+let uri
+if (process.env.NODE_ENV === 'development') {
+  uri = `mongodb://localhost:27017/${databaseName}`
+} else if (process.env.NODE_ENV === 'production') {
+  uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@demo-extension-pems.zeqcit3.mongodb.net/?retryWrites=true&w=majority`
+}
 // Set up your options to MongoDB, default is below
 const options = {
   useNewUrlParser: true,
