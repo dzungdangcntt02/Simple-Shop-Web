@@ -20,6 +20,7 @@ if (config.nodeEnv === 'production') {
   const logsDir = path.join(__dirname, '..', 'logs')
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!fs.existsSync(logsDir)) {
+    logger.info('Logs directory not found. Now create logs directory')
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.mkdirSync(logsDir)
   }
