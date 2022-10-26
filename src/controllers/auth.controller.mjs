@@ -85,7 +85,7 @@ export const sendValidationEmail = catchAsync(async (req, res) => {
       // If token is still valid => User must open recent mail to activate
       tokenService.verifyToken(validateAccountToken, 'validateAccount')
 
-      return response(res, httpStatus.NO_CONTENT, 'Email already exist. Check mailbox')
+      response(res, httpStatus.OK, 'Email already exist. Check mailbox')
     } catch (e) {
       // If token is expired => remove the old and create new one and send another mail to user
       if (e.message === httpStatus[401]) {

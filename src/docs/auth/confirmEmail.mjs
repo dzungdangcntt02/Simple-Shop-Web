@@ -27,7 +27,7 @@ export default {
     },
     responses: {
       200: {
-        description: 'Send email successfully',
+        description: 'Send email successfully or email already sent',
         content: {
           'application/json': {
             example: {
@@ -45,18 +45,6 @@ export default {
             example: {
               code: 201,
               message: 'New email sent',
-              data: [],
-            },
-          },
-        },
-      },
-      204: {
-        description: 'Email already exists in mailbox with valid token',
-        content: {
-          'application/json': {
-            example: {
-              code: 204,
-              message: 'Email already exist. Check mailbox',
               data: [],
             },
           },
