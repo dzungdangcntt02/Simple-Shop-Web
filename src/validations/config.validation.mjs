@@ -1,12 +1,13 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { config } from 'dotenv'
 import Joi from 'joi'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+if (process.env.NODE_ENV !== 'production' || process.env?.IS_LOCAL_PROD) {
+  const { config } = await import('dotenv')
+  const { join, dirname } = await import('path')
+  const { fileURLToPath } = await import('url')
 
-config({ path: join(__dirname, '..', '..', '.env') })
+  const __dirname = dirname(fileURLToPath(import.meta.url))
+  config({ path: join(__dirname, '..', '..', '.env') })
+}
 
 const envVarsSchema = Joi.object()
   .keys({
@@ -63,7 +64,7 @@ export const email = (nodeEnv === 'development' || nodeEnv === 'test')
         pass: envVars.DEV_SMTP_PASSWORD,
       },
     },
-    from: envVars.DEV_EMAIL_FROM,
+    from: envVars.EMAIL_FROM,
   }
   : {
     smtp: {

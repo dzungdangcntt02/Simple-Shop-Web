@@ -1,5 +1,6 @@
 import morgan, { token } from 'morgan'
 import rfs from 'rotating-file-stream'
+import fs from 'fs'
 
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -16,6 +17,12 @@ const generator = (_time, _index) => `${getHighResDateTime()}.log`
 let stream
 // Create stream thread
 if (config.nodeEnv === 'production') {
+  const logsDir = path.join(__dirname, '..', 'logs')
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  if (!fs.existsSync(logsDir)) {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(logsDir)
+  }
   stream = rfs.createStream(generator, {
     size: '10M', // rotate every 10 MegaBytes written
     interval: '1d', // rotate daily
