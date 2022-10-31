@@ -5,6 +5,7 @@ specifiers:
   '@sendgrid/mail': ^7.7.0
   '@types/jest': ^29.1.2
   bcrypt: ^5.0.1
+  colors: ^1.4.0
   compression: ^1.7.4
   cors: ^2.8.5
   cross-env: ^7.0.3
@@ -40,6 +41,7 @@ specifiers:
 dependencies:
   '@sendgrid/mail': 7.7.0
   bcrypt: 5.0.1
+  colors: 1.4.0
   compression: 1.7.4
   cors: 2.8.5
   express: 4.18.1
@@ -1639,6 +1641,11 @@ packages:
     dependencies:
       color-convert: 1.9.3
       color-string: 1.9.1
+    dev: false
+
+  /colors/1.4.0:
+    resolution: {integrity: sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==}
+    engines: {node: '>=0.1.90'}
     dev: false
 
   /colorspace/1.1.4:

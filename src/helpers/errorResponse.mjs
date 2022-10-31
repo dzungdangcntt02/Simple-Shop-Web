@@ -1,6 +1,10 @@
 import httpStatus from 'http-status'
+// eslint-disable-next-line no-unused-vars
+import colors from 'colors'
+
 import logger from '../config/logger.mjs'
 import { config } from '../validations/index.mjs'
+
 /**
  * Return immediately error response with status code and message thrown from api error
  * @param {object} res response object
@@ -28,6 +32,10 @@ export const errorResponseSpecification = (err, res, codeArr = []) => {
   res.locals.errorMessage = message
   if (config.nodeEnv === 'development' || process.env.NODE_ENV === 'development') {
     logger.error(err)
+  }
+  if (config.nodeEnv === 'test' || process.env.NODE_ENV === 'test') {
+    // eslint-disable-next-line no-console
+    // console.log(colors.blue(err.message))
   }
 
   if (codeArr && codeArr.includes(statusCode)) {
