@@ -17,18 +17,6 @@ export const login = {
   }),
 }
 
-export const confirmEmail = {
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-  }),
-}
-
-export const confirmAccount = {
-  params: Joi.object().keys({
-    token: Joi.string().required(),
-  }),
-}
-
 export const findAccount = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),

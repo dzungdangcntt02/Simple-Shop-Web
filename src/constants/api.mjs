@@ -5,7 +5,6 @@ export const ENDPOINTS = {
     BASE: 'auth',
     REGISTER: 'register',
     LOGIN: 'sign-in',
-    VALIDATE_EMAIL: 'confirm-email',
     FIND_ACCOUNT: 'find-account',
     RESETPW_EMAIL: 'resetpw-email',
     VALIDATE_PWCODE: 'confirm-pwcode',
@@ -15,6 +14,7 @@ export const ENDPOINTS = {
   },
   USER: {
     BASE: 'user',
+    VALIDATE_EMAIL: 'confirm-email',
   },
   DOCS: {
     BASE: 'docs',

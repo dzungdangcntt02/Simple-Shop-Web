@@ -2,8 +2,8 @@ import { V1, ENDPOINTS } from './api.mjs'
 import { config } from '../validations/index.mjs'
 
 const validateURL = token => ((config.nodeEnv === 'production')
-  ? `${config.host}${V1}/${ENDPOINTS.AUTH.BASE}/${ENDPOINTS.AUTH.VALIDATE_EMAIL}/t=${token}`
-  : `http://${config.host}:${config.port}${V1}/${ENDPOINTS.AUTH.BASE}/${ENDPOINTS.AUTH.VALIDATE_EMAIL}/t=${token}`)
+  ? `${config.host}${V1}/${ENDPOINTS.USER.BASE}/${ENDPOINTS.USER.VALIDATE_EMAIL}/t=${token}`
+  : `http://${config.host}:${config.port}${V1}/${ENDPOINTS.USER.BASE}/${ENDPOINTS.USER.VALIDATE_EMAIL}/t=${token}`)
 
 export const verifyAccount = token => ({
   subject: 'Verify your Simple Web\'s account',
