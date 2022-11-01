@@ -15,9 +15,6 @@ const {
 const router = express.Router()
 
 router.post(`/${VALIDATE_EMAIL}`, verifyUser(permissions.USER.UPDATE_USER), userController.sendValidationEmail)
-router.get(`/${VALIDATE_EMAIL}/t=:token`, userController.confirmAccount)
-
-// router.get('/sse/activate-account', sse.init)
-// router.get('/sse/test', authController.ssActivateEmail)
+router.get(`/${VALIDATE_EMAIL}/t=:token`, validate(user.confirmAccount), userController.confirmAccount)
 
 export default router
