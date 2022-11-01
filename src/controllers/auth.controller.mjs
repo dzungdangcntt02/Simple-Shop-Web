@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import httpStatus from 'http-status'
-import sse from './ssEvents.mjs'
 
 import { getRandomArbitrary } from '../common/generateOTP.mjs'
 import response from '../helpers/resolvedResponse.mjs'
@@ -175,11 +174,6 @@ export const resetPassword = catchAsync(async (req, res) => {
   } catch (err) {
     return errorResponseSpecification(err, res, [httpStatus.UNAUTHORIZED])
   }
-})
-
-export const ssActivateEmail = catchAsync(async (req, res) => {
-  sse.send({ unRead: true }, 'post')
-  return res.status(200).json({ unRead: true })
 })
 
 export const test = catchAsync(async (req, res) => {

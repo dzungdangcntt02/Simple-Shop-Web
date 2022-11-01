@@ -7,6 +7,7 @@ import catchAsync from '../helpers/catchAsync.mjs'
 import { errorResponseSpecification } from '../helpers/errorResponse.mjs'
 import response from '../helpers/resolvedResponse.mjs'
 import { emailService, tokenService, userService } from '../services/index.mjs'
+import { sseActivateAccount } from '../routes/v1/sse.route.mjs'
 
 export const sendValidationEmail = catchAsync(async (req, res) => {
   const { user } = req
@@ -72,6 +73,8 @@ export const confirmAccount = catchAsync(async (req, res) => {
     }
 
     response(res, httpStatus.OK, httpStatus[200])
+
+    sseActivateAccount.send({ hasActivated: true }, 'activateAccount')
   } catch (err) {
     errorResponseSpecification(err, res, [httpStatus.UNAUTHORIZED, httpStatus.FORBIDDEN])
   }

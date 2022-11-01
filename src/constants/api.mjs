@@ -12,6 +12,10 @@ export const ENDPOINTS = {
     REFRESH_TOKEN: 'refresh-token',
     TEST: 'test',
   },
+  SSE: {
+    BASE: 'sse',
+    VALIDATE_EMAIL: 'activate-account',
+  },
   USER: {
     BASE: 'user',
     VALIDATE_EMAIL: 'confirm-email',
