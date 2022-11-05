@@ -5,7 +5,7 @@ export const permissions = {
     READ_USERS: 'read_users', // Admin right
     UPDATE_USER: 'update_user', // User & Admin right
     UPDATE_USERS: 'update_users', // Admin right
-    DELETE_USER: 'get_user', // Admin right
+    DELETE_USER: 'delete_user', // Admin right
   },
 }
 

@@ -44,6 +44,7 @@ class SSE extends EventEmitter {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('X-Accel-Buffering', 'no');
+    // res.setHeader('Access-Control-Allow-Origin', '')
     if (req.httpVersion !== '2.0') {
       res.setHeader('Connection', 'keep-alive');
     }
