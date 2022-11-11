@@ -3,4 +3,7 @@ export const tags = [
   {
     name: 'Auth CRUD operations',
   },
+  {
+    name: 'User CRUD operations',
+  },
 ];
