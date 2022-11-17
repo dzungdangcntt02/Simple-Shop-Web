@@ -56,7 +56,7 @@ describe('User routes', () => {
         request(app)
           .post(`${V1}/${BASE}/${VALIDATE_EMAIL}`)
           .set({ 'Authorization': `Bearer ${token}` })
-          .then(async (res) => {
+          .then(async (_res) => {
             await
               request(app)
                 .post(`${V1}/${BASE}/${VALIDATE_EMAIL}`)

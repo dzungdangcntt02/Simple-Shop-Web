@@ -12,6 +12,7 @@ import { api, status, expireOTP, role } from '../../src/constants/index.mjs'
 import { tokenService, userService } from '../../src/services/index.mjs'
 import { config } from '../../src/validations/index.mjs'
 import { stringToDate } from '../../src/common/toDate.mjs'
+import { Token } from '../../src/models/token.model.mjs'
 
 
 const { ENDPOINTS, V1 } = api
@@ -23,6 +24,7 @@ const {
   RESETPW_EMAIL,
   VALIDATE_PWCODE,
   RESET_PASSWORD,
+  REFRESH_TOKEN,
 } = ENDPOINTS.AUTH
 
 setupTestDB()
@@ -67,11 +69,11 @@ describe('Auth routes', () => {
       expect(res.body.data.tokens).toEqual({
         access: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         },
         refresh: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         },
       })
     })
@@ -117,11 +119,11 @@ describe('Auth routes', () => {
       expect(res.body.data.tokens).toEqual({
         access: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         },
         refresh: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         }
       })
     })
@@ -530,5 +532,88 @@ describe('Auth routes', () => {
     //   expect(updatedUser?.resetPwToken).toBeDefined()
     // })
 
+  })
+
+  // * Refresh token 
+  // Test refresh token API
+  describe(`POST ${V1}/${BASE}/${REFRESH_TOKEN} .refreshToken`, () => {
+    // Arrange
+    let inactiveUser
+    let user
+    beforeEach(async () => {
+      const { role, status } = await import('../../src/constants/index.mjs')
+      inactiveUser = {
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        role: role.USER,
+        status: status.INACTIVE,
+      }
+      await insertUsers([inactiveUser])
+    })
+    it('should return 201 with new access token and new refresh token', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      const { token: AT, expiresAt: ATexpires } = tokens.access
+      const { token: RT, expiresAt: RTexpires } = tokens.refresh
+
+      const { previousToken, isCurrentlyValid, user: userId } = await Token.findOne({ token: RT })
+
+      expect(res.statusCode).toBe(201)
+      expect(AT).toBeDefined()
+      expect(RT).toBeDefined()
+      expect(ATexpires).toBeGreaterThan(Date.now() / 1000)
+      expect(RTexpires).toBeGreaterThan(Date.now() / 1000)
+      expect(previousToken).toBe(tokens.refresh.token)
+      expect(isCurrentlyValid).toBe(true)
+      expect(userId.toString()).toStrictEqual(user._id.toString())
+    })
+
+    it('should return 400 if user do not provide RT', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('should return 401 if detects reuse RT of malicious user', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+          .then(async res => {
+            const { token: RT } = res.body.data.refresh
+            const res1 = await
+              request(app)
+                .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+                .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+                .send({ refresh: tokens.refresh.token })
+
+            const { previousToken, isCurrentlyValid } = await Token.findOne({ token: RT })
+
+            expect(res1.statusCode).toBe(401)
+            expect(previousToken).toBe(tokens.refresh.token)
+            expect(isCurrentlyValid).toBe(false)
+          })
+    })
   })
 })

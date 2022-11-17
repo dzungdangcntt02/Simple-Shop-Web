@@ -4,6 +4,7 @@ import findAccount from './findAccount.mjs'
 import resetpwEmail from './resetpwEmail.mjs'
 import confirmPwCode from './confirmPwCode.mjs'
 import resetPw from './resetPw.mjs'
+import refreshToken from './refreshToken.mjs'
 
 export default {
   '/api/v1/auth/register': {
@@ -23,5 +24,8 @@ export default {
   },
   '/api/v1/auth/reset-pw': {
     ...resetPw,
+  },
+  '/api/v1/auth/refresh-token': {
+    ...refreshToken,
   },
 }

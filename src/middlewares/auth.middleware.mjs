@@ -8,10 +8,6 @@ import ApiError from '../helpers/ApiError.mjs'
 export const verifyUser = (...requiredRights) => async (req, _res, next) => {
   const authHeader = req.headers?.authorization
   try {
-    // if (process.env.NODE_ENV === 'test') {
-    //   return next()
-    // }
-
     if (!authHeader) {
       throw new ApiError(httpStatus.BAD_REQUEST, httpStatus[400])
     }
