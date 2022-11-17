@@ -31,6 +31,8 @@ export const register = catchAsync(async (req, res) => {
 
     const tokens = tokenService.generateAuthTokens(sanitizedUser)
 
+    await tokenService.createSessionUser(tokens.refresh.token, user._id);
+
     response(res, httpStatus.CREATED, httpStatus[201], {
       tokens,
       user: sanitizedUser,
@@ -43,11 +45,13 @@ export const register = catchAsync(async (req, res) => {
 export const login = catchAsync(async (req, res) => {
   const { email, password } = req.body
   try {
-    const { resetPwRate, ...user } = await authService.loginWithEmailAndPassword(email, password)
-    const tokens = tokenService.generateAuthTokens(user)
+    const { resetPwRate, ...sanitizedUser } = await authService.loginWithEmailAndPassword(email, password)
+    const tokens = tokenService.generateAuthTokens(sanitizedUser)
+
+    await tokenService.createSessionUser(tokens.refresh.token, sanitizedUser.id);
 
     response(res, httpStatus.OK, httpStatus[200], {
-      user,
+      user: sanitizedUser,
       tokens,
     })
   } catch (e) {
@@ -173,6 +177,48 @@ export const resetPassword = catchAsync(async (req, res) => {
     response(res, httpStatus.OK, httpStatus[200])
   } catch (err) {
     return errorResponseSpecification(err, res, [httpStatus.UNAUTHORIZED])
+  }
+})
+
+export const refreshToken = catchAsync(async (req, res) => {
+  const authHeader = req.headers?.authorization
+  const { refresh } = req.body
+  try {
+    if (!authHeader) {
+      throw new ApiError(httpStatus.BAD_REQUEST, httpStatus[400])
+    }
+
+    // Detect reuse token
+    const preCheck = await tokenService.getSessionByPreviousToken(refresh)
+    if (preCheck) {
+      preCheck.isCurrentlyValid = false
+      await preCheck.save()
+
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Malicious action detected! Please authenticate your account!')
+    }
+
+    const session = await tokenService.getSessionByToken(refresh)
+    if (!session) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+    }
+
+    if (!session.isCurrentlyValid || session.isBlacklisted) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+    }
+
+    await tokenService.verifyToken(refresh, 'refresh')
+
+    const newTokens = tokenService.generateAuthTokens(session.user)
+    session.token = newTokens.refresh.token
+    session.previousToken = refresh
+
+    await session.save()
+
+    return response(res, httpStatus.CREATED, httpStatus[201], {
+      ...newTokens,
+    })
+  } catch (err) {
+    return errorResponseSpecification(err, res, [httpStatus.BAD_REQUEST, httpStatus.UNAUTHORIZED])
   }
 })
 

@@ -43,3 +43,9 @@ export const resetPassword = {
     resetPassword: Joi.string().required().custom(password),
   }),
 }
+
+export const refreshToken = {
+  body: Joi.object().keys({
+    refresh: Joi.string().required(),
+  }),
+}

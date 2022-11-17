@@ -1,7 +1,7 @@
 export default {
   post: {
     summary: 'Send email to verify user',
-    tags: ['Auth CRUD operations'],
+    tags: ['User CRUD operations'],
     requestBody: {
       required: true,
       content: {
