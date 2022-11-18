@@ -5,6 +5,7 @@ import resetpwEmail from './resetpwEmail.mjs'
 import confirmPwCode from './confirmPwCode.mjs'
 import resetPw from './resetPw.mjs'
 import refreshToken from './refreshToken.mjs'
+import logout from './logout.mjs'
 
 export default {
   '/api/v1/auth/register': {
@@ -27,5 +28,8 @@ export default {
   },
   '/api/v1/auth/refresh-token': {
     ...refreshToken,
+  },
+  '/api/v1/auth/sign-out': {
+    ...logout,
   },
 }

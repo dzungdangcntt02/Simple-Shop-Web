@@ -97,3 +97,5 @@ export const verifyToken = (token, keyType = 'access', msg = undefined) => {
 export const getSessionByToken = async token => Token.findOne({ token }).populate('user')
 
 export const getSessionByPreviousToken = async token => Token.findOne({ previousToken: token })
+
+export const removeSession = async token => Token.findOneAndRemove({ token })

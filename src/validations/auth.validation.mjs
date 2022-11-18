@@ -49,3 +49,9 @@ export const refreshToken = {
     refresh: Joi.string().required(),
   }),
 }
+
+export const logout = {
+  body: Joi.object().keys({
+    refresh: Joi.string().required(),
+  }),
+}

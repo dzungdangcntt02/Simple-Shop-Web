@@ -16,6 +16,7 @@ const {
   VALIDATE_PWCODE,
   RESET_PASSWORD,
   REFRESH_TOKEN,
+  LOGOUT,
 } = api.ENDPOINTS.AUTH
 
 const router = express.Router()
@@ -26,6 +27,7 @@ router.post(`/${RESETPW_EMAIL}`, validate(auth.sendResetPwMail), authController.
 router.post(`/${VALIDATE_PWCODE}`, validate(auth.checkResetPwCode), authController.checkResetPwCode)
 router.post(`/${RESET_PASSWORD}`, validate(auth.resetPassword), authController.resetPassword)
 router.post(`/${REFRESH_TOKEN}`, validate(auth.refreshToken), authController.refreshToken)
+router.post(`/${LOGOUT}`, validate(auth.logout), authController.logout)
 
 router.post(`/${TEST}`, verifyUser(permissions.USER.CREATE_USER), authController.test)
 router.post(`/${TEST}/:userId`, verifyUser(permissions.USER.READ_USER), authController.test)
