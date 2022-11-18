@@ -39,6 +39,10 @@ export const generateAuthTokens = user => {
     sub: id,
     iat: now, // Epoch time in second
   }
+  if (process.env.NODE_ENV === 'test') {
+    // Unique token in test env with sync timer
+    payload.salt = Math.random()
+  }
   const accessToken = generateToken(payload, accessTokenKey, { expiresIn: accessTokenExpires })
   const refreshToken = generateToken(payload, refreshTokenKey, { expiresIn: refreshTokenExpires })
 

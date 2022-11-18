@@ -22,6 +22,7 @@ import {
 import ApiError from '../helpers/ApiError.mjs'
 import { config } from '../validations/index.mjs'
 import { stringToDate } from '../common/toDate.mjs'
+import logger from '../config/logger.mjs'
 
 export const register = catchAsync(async (req, res) => {
   const doc = pick(req.body, ['username', 'email', 'password'])
@@ -71,7 +72,7 @@ export const findAccount = catchAsync(async (req, res) => {
     user.resetPwRate = 0
   }
 
-  const token = tokenService.generateToken({ sub: user._id }, config.defaultTokenKey, { expiresIn: 5 * 60 }) // Expires in 5 mins
+  const token = tokenService.generateToken({ sub: user._id, email: user.email }, config.defaultTokenKey, { expiresIn: 5 * 60 }) // Expires in 5 mins
   user.findAccountToken = token
 
   await user.save()
@@ -191,10 +192,12 @@ export const refreshToken = catchAsync(async (req, res) => {
     // Detect reuse token
     const preCheck = await tokenService.getSessionByPreviousToken(refresh)
     if (preCheck) {
+      if (process.env.NODE_ENV !== 'test') logger.warn('Malicious action detected!')
+
       preCheck.isCurrentlyValid = false
       await preCheck.save()
 
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Malicious action detected! Please authenticate your account!')
+      throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
     }
 
     const session = await tokenService.getSessionByToken(refresh)
@@ -202,7 +205,11 @@ export const refreshToken = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
     }
 
-    if (!session.isCurrentlyValid || session.isBlacklisted) {
+    if (!session.isCurrentlyValid) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'Malicious action detected! Please authenticate your account!')
+    }
+
+    if (session.isBlacklisted || session.user.status === status.BANNED) {
       throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
     }
 
@@ -218,7 +225,7 @@ export const refreshToken = catchAsync(async (req, res) => {
       ...newTokens,
     })
   } catch (err) {
-    return errorResponseSpecification(err, res, [httpStatus.BAD_REQUEST, httpStatus.UNAUTHORIZED])
+    return errorResponseSpecification(err, res, [httpStatus.BAD_REQUEST, httpStatus.UNAUTHORIZED, httpStatus.FORBIDDEN])
   }
 })
 
