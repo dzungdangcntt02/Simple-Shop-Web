@@ -534,7 +534,6 @@ describe('Auth routes', () => {
     // })
 
   })
-
   // * Refresh token 
   // Test refresh token API
   describe(`POST ${V1}/${BASE}/${REFRESH_TOKEN} .refreshToken`, () => {
@@ -565,7 +564,7 @@ describe('Auth routes', () => {
       const { token: AT, expiresAt: ATexpires } = tokens.access
       const { token: RT, expiresAt: RTexpires } = tokens.refresh
 
-      const { previousToken, isCurrentlyValid, user: userId } = await Token.findOne({ token: RT })
+      const { previousToken, isCurrentlyValid, user: userId } = await tokenService.getSessionByPreviousToken(RT)
 
       expect(res.statusCode).toBe(201)
       expect(AT).toBeDefined()
@@ -588,6 +587,38 @@ describe('Auth routes', () => {
           .set({ 'Authorization': `Bearer ${tokens.access.token}` })
 
       expect(res.statusCode).toBe(400)
+    })
+    it('should return 401 if user is blackisted', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+      const session = await tokenService.getSessionByToken(tokens.refresh.token)
+      session.isBlacklisted = true
+      await session.save()
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(401)
+    })
+
+    it('should return 401 if user is banned', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+      user.status = status.BANNED
+      await user.save()
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(401)
     })
 
     it('should return 401 if detects reuse RT of malicious user', async () => {
@@ -615,8 +646,59 @@ describe('Auth routes', () => {
             expect(isCurrentlyValid).toBe(false)
           })
     })
-  })
 
+    it('should return 403 if legit user try to access invalidate RT', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      const AT0 = tokens.refresh.token
+      const RT0 = tokens.refresh.token
+      await tokenService.createSessionUser(RT0, user._id)
+
+      // ! Legit user with the second time RT0
+      await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${AT0}` })
+          .send({ refresh: RT0 })
+          .then(async res => {
+            const { token: AT1 } = res.body.data.access
+            const { token: RT1 } = res.body.data.refresh
+
+            const sess1 = await tokenService.getSessionByToken(RT1)
+            expect(sess1.previousToken === RT0).toBeTruthy()
+            expect(sess1.token === RT1).toBeTruthy()
+            expect(sess1.isCurrentlyValid).toBeTruthy()
+
+            // ! Malicious action with RT0
+            await
+              request(app)
+                .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+                .set({ 'Authorization': `Bearer ${AT0}` })
+                .send({ refresh: RT0 })
+                .then(async _res => {
+                  const sess2 = await tokenService.getSessionByToken(RT1)
+
+                  expect(sess2.previousToken === RT0).toBeTruthy()
+                  expect(sess2.token === RT1).toBeTruthy()
+                  expect(sess2.isCurrentlyValid).toBeFalsy()
+
+                  // ! Legit user try to refresh token with RT1
+                  const res1 = await
+                    request(app)
+                      .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+                      .set({ 'Authorization': `Bearer ${AT1}` })
+                      .send({ refresh: RT1 })
+
+                  const { isCurrentlyValid, token } = await tokenService.getSessionByToken(RT1)
+
+                  expect(RT1 === token).toBeTruthy()
+                  expect(isCurrentlyValid).toBeFalsy()
+                  expect(res1.statusCode).toBe(403)
+                  expect(isCurrentlyValid).toBe(false)
+                })
+          })
+    })
+  })
   // * Log out token 
   // Test log out API
   describe(`POST ${V1}/${BASE}/${LOGOUT} .logout`, () => {
