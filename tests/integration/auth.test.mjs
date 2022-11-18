@@ -25,6 +25,7 @@ const {
   VALIDATE_PWCODE,
   RESET_PASSWORD,
   REFRESH_TOKEN,
+  LOGOUT,
 } = ENDPOINTS.AUTH
 
 setupTestDB()
@@ -539,7 +540,6 @@ describe('Auth routes', () => {
   describe(`POST ${V1}/${BASE}/${REFRESH_TOKEN} .refreshToken`, () => {
     // Arrange
     let inactiveUser
-    let user
     beforeEach(async () => {
       const { role, status } = await import('../../src/constants/index.mjs')
       inactiveUser = {
@@ -614,6 +614,80 @@ describe('Auth routes', () => {
             expect(previousToken).toBe(tokens.refresh.token)
             expect(isCurrentlyValid).toBe(false)
           })
+    })
+  })
+
+  // * Log out token 
+  // Test log out API
+  describe(`POST ${V1}/${BASE}/${LOGOUT} .logout`, () => {
+    // Arrange
+    let inactiveUser
+    beforeEach(async () => {
+      const { role, status } = await import('../../src/constants/index.mjs')
+      inactiveUser = {
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        role: role.USER,
+        status: status.INACTIVE,
+      }
+      await insertUsers([inactiveUser])
+    })
+    it('should return 200 when log out session successfully', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      const session = await Token.findOne({ token: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(200)
+      expect(session).toBeNull()
+    })
+
+    it('should return 400 if user do not provide RT', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('should return 400 if user do not provide AT in header', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .send({ refresh: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('should return 404 if refresh token not found in DB', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8' })
+
+      expect(res.statusCode).toBe(404)
     })
   })
 })

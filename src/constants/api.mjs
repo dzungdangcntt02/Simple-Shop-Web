@@ -10,6 +10,7 @@ export const ENDPOINTS = {
     VALIDATE_PWCODE: 'confirm-pwcode',
     RESET_PASSWORD: 'reset-pw',
     REFRESH_TOKEN: 'refresh-token',
+    LOGOUT: 'sign-out',
     TEST: 'test',
   },
   SSE: {

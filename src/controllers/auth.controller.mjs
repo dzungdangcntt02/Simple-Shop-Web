@@ -222,6 +222,24 @@ export const refreshToken = catchAsync(async (req, res) => {
   }
 })
 
+export const logout = catchAsync(async (req, res) => {
+  const { refresh } = req.body
+  const authHeader = req.headers?.authorization
+  try {
+    if (!authHeader) {
+      throw new ApiError(httpStatus.BAD_REQUEST, httpStatus[400])
+    }
+    const session = await tokenService.removeSession(refresh)
+    if (!session) {
+      throw new ApiError(httpStatus.NOT_FOUND, httpStatus[404])
+    }
+
+    return response(res, httpStatus.OK, httpStatus[200])
+  } catch (err) {
+    return errorResponseSpecification(err, res, [httpStatus.BAD_REQUEST, httpStatus.NOT_FOUND])
+  }
+})
+
 export const test = catchAsync(async (req, res) => {
   response(res, httpStatus.OK, httpStatus[200], {
     user: req.user,
