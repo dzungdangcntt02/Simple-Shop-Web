@@ -46,7 +46,7 @@ export default {
         },
       },
       400: {
-        description: 'Refresh token not found',
+        description: 'Refresh token or access token not found',
         content: {
           'application/json': {
             example: {
@@ -58,12 +58,24 @@ export default {
         },
       },
       401: {
-        description: 'Unauthorized by invalid refresh token or malicious action',
+        description: 'Unauthorized by invalid refresh token or malicious action or blacklist user or banned user',
         content: {
           'application/json': {
             example: {
               code: 401,
               message: 'Unauthorized',
+              data: [],
+            },
+          },
+        },
+      },
+      403: {
+        description: 'Detects malicious action, requires user to re-login again',
+        content: {
+          'application/json': {
+            example: {
+              code: 403,
+              message: 'Malicious action detected! Please authenticate your account!',
               data: [],
             },
           },
