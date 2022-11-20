@@ -72,7 +72,7 @@ export const findAccount = catchAsync(async (req, res) => {
     user.resetPwRate = 0
   }
 
-  const token = tokenService.generateToken({ sub: user._id }, config.defaultTokenKey, { expiresIn: 5 * 60 }) // Expires in 5 mins
+  const token = tokenService.generateToken({ sub: user._id, email: user.email }, config.defaultTokenKey, { expiresIn: 5 * 60 }) // Expires in 5 mins
   user.findAccountToken = token
 
   await user.save()
@@ -213,7 +213,7 @@ export const refreshToken = catchAsync(async (req, res) => {
       throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
     }
 
-    await tokenService.verifyToken(refresh, 'refresh')
+    await tokenService.verifyToken(refresh, 'refresh', 'Expired token')
 
     const newTokens = tokenService.generateAuthTokens(session.user)
     session.token = newTokens.refresh.token
