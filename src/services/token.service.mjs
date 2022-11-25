@@ -45,8 +45,6 @@ export const generateAuthTokens = user => {
   }
   const accessToken = generateToken(payload, accessTokenKey, { expiresIn: accessTokenExpires })
   const refreshToken = generateToken(payload, refreshTokenKey, { expiresIn: refreshTokenExpires })
-  // const accessToken = generateToken(payload, accessTokenKey, { expiresIn: 30 })
-  // const refreshToken = generateToken(payload, refreshTokenKey, { expiresIn: 60 })
 
   return {
     access: {
