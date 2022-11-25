@@ -17,18 +17,6 @@ export const login = {
   }),
 }
 
-export const confirmEmail = {
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-  }),
-}
-
-export const confirmAccount = {
-  params: Joi.object().keys({
-    token: Joi.string().required(),
-  }),
-}
-
 export const findAccount = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),
@@ -53,5 +41,17 @@ export const resetPassword = {
   body: Joi.object().keys({
     token: Joi.string().required(),
     resetPassword: Joi.string().required().custom(password),
+  }),
+}
+
+export const refreshToken = {
+  body: Joi.object().keys({
+    refresh: Joi.string().required(),
+  }),
+}
+
+export const logout = {
+  body: Joi.object().keys({
+    refresh: Joi.string().required(),
   }),
 }

@@ -39,6 +39,13 @@ export const createUser = async doc => {
 export const getUserById = async id => User.findById(id)
 
 /**
+ * @param {string} id objectId
+ * @param {object} filters fields to update
+ * @returns {object<mongoose>} result
+ */
+export const updateUserById = async (id, filters) => User.findByIdAndUpdate(id, filters)
+
+/**
  * Check if a password is valid or not
  * @param {object} user mongoose object
  * @param {string} password requested password from client

@@ -1,14 +1,16 @@
 import { V1, ENDPOINTS } from './api.mjs'
 import { config } from '../validations/index.mjs'
 
-const validateURL = token => `http://${config.host}:${config.port}${V1}/${ENDPOINTS.AUTH.BASE}/${ENDPOINTS.AUTH.VALIDATE_EMAIL}/t=${token}`
+const validateURL = token => ((config.nodeEnv === 'production')
+  ? `${config.host}${V1}/${ENDPOINTS.USER.BASE}/${ENDPOINTS.USER.VALIDATE_EMAIL}/t=${token}`
+  : `http://${config.host}:${config.port}${V1}/${ENDPOINTS.USER.BASE}/${ENDPOINTS.USER.VALIDATE_EMAIL}/t=${token}`)
 
-export const verifyAccount = url => ({
+export const verifyAccount = token => ({
   subject: 'Verify your Simple Web\'s account',
-  text: `Click to this link ${validateURL(url)} to verify your account`,
+  text: `Click to this link ${validateURL(token)} to verify your account`,
   html: `
   <div style="display: flex; justify-content: center;">
-  <a href="${validateURL(url)}"
+  <a href="${validateURL(token)}"
   style="display: inline-block; 
   background-color: #04AA6D;
   text-decoration: none;

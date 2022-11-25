@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import jwt from 'jsonwebtoken'
 import httpStatus from 'http-status'
 
+import { Token } from '../models/index.mjs'
 import { config } from '../validations/index.mjs'
 import ApiError from '../helpers/ApiError.mjs'
 
@@ -15,28 +16,46 @@ const {
 
 export const generateToken = (payload, key, options) => jwt.sign(payload, key, options)
 
+/**
+ * Create a new session of user
+ * @param {string} token refresh token
+ * @param {string} id object id of user
+ * @returns {Promise<mongoose>}
+ */
+export const createSessionUser = async (token, id) => Token.create({
+  token,
+  user: id,
+})
+
 export const generateAuthTokens = user => {
-  const now = DateTime.now().toUnixInteger()
-  const accessTokenExpires = accessTokenLife * 60 // Minutes
-  const refreshTokenExpires = refreshTokenLife * 60 * 60 * 24 // Days
+  const now = DateTime.now().toUnixInteger() // Epoch time in second
+  const accessTokenExpires = accessTokenLife * 60 // In Second
+  const refreshTokenExpires = refreshTokenLife * 60 * 60 * 24 // In second
   const id = user?._id || user?.id
   const { role, status } = user
   const payload = {
     role,
     status,
     sub: id,
-    iat: now,
+    iat: now, // Epoch time in second
   }
-  const accessToken = generateToken(payload, accessTokenKey, { expiresIn: accessTokenExpires })
-  const refreshToken = generateToken(payload, refreshTokenKey, { expiresIn: refreshTokenExpires })
+  if (process.env.NODE_ENV === 'test') {
+    // Unique token in test env with sync timer
+    payload.salt = Math.random()
+  }
+  // const accessToken = generateToken(payload, accessTokenKey, { expiresIn: accessTokenExpires })
+  // const refreshToken = generateToken(payload, refreshTokenKey, { expiresIn: refreshTokenExpires })
+  const accessToken = generateToken(payload, accessTokenKey, { expiresIn: 30 })
+  const refreshToken = generateToken(payload, refreshTokenKey, { expiresIn: 60 })
+
   return {
     access: {
       token: accessToken,
-      expiresIn: accessTokenExpires, // Duration expires
+      expiresAt: now + accessTokenExpires, // Time expires in epoch second
     },
     refresh: {
       token: refreshToken,
-      expiresIn: refreshTokenExpires, // Duration expires
+      expiresAt: now + refreshTokenExpires, // Time expires in epoch second
     },
   }
 }
@@ -80,3 +99,9 @@ export const verifyToken = (token, keyType = 'access', msg = undefined) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, msg || httpStatus[401])
   }
 }
+
+export const getSessionByToken = async token => Token.findOne({ token }).populate('user')
+
+export const getSessionByPreviousToken = async token => Token.findOne({ previousToken: token })
+
+export const removeSession = async token => Token.findOneAndRemove({ token })

@@ -12,18 +12,20 @@ import { api, status, expireOTP, role } from '../../src/constants/index.mjs'
 import { tokenService, userService } from '../../src/services/index.mjs'
 import { config } from '../../src/validations/index.mjs'
 import { stringToDate } from '../../src/common/toDate.mjs'
+import { Token } from '../../src/models/token.model.mjs'
 
 
 const { ENDPOINTS, V1 } = api
 const {
   REGISTER,
   LOGIN,
-  VALIDATE_EMAIL,
   BASE,
   FIND_ACCOUNT,
   RESETPW_EMAIL,
   VALIDATE_PWCODE,
   RESET_PASSWORD,
+  REFRESH_TOKEN,
+  LOGOUT,
 } = ENDPOINTS.AUTH
 
 setupTestDB()
@@ -68,11 +70,11 @@ describe('Auth routes', () => {
       expect(res.body.data.tokens).toEqual({
         access: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         },
         refresh: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         },
       })
     })
@@ -118,11 +120,11 @@ describe('Auth routes', () => {
       expect(res.body.data.tokens).toEqual({
         access: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         },
         refresh: {
           token: expect.anything(),
-          expiresIn: expect.anything(),
+          expiresAt: expect.anything(),
         }
       })
     })
@@ -149,131 +151,6 @@ describe('Auth routes', () => {
         password: 'wrong password',
       })
       expect(res.body.code).toBe(401)
-    })
-
-  })
-  // * send validate email
-  // Test validate email API
-  describe(`POST ${V1}/${BASE}/${VALIDATE_EMAIL} .sendValidationEmail`, () => {
-
-    let inactiveUser
-    beforeEach(async () => {
-      const { role, status } = await import('../../src/constants/index.mjs')
-      inactiveUser = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-        role: role.USER,
-        status: status.INACTIVE,
-      }
-      await insertUsers([inactiveUser])
-    })
-
-    it('should return 200 if email sent', async () => {
-      const res = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
-      expect(res.statusCode).toBe(200)
-    })
-
-    it('should return 204 if email already exist in mailbox', async () => {
-      await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
-      const nextRes = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: inactiveUser.email })
-
-      expect(nextRes.statusCode).toBe(204)
-    })
-
-    // TODO Solve problem: how to fast-forward to 5 minutes later to test expired token in calling API
-    // it('should return 201 when send new email after 5 minutes expired token', async () => {
-    //
-    // })
-
-    it('should return 400 if email is not a valid email', async () => {
-      const res = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: 'invalid email' })
-      expect(res.statusCode).toBe(400)
-    })
-
-    it('should return 400 if email not exists', async () => {
-      const res = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: 'fakemail@gmail.com' })
-      expect(res.statusCode).toBe(400)
-    })
-
-    it('should return 403 if user is already active or banned', async () => {
-      const user = await User.findOneAndUpdate({ email: inactiveUser.email }, { status: status.ACTIVE })
-
-      const res1 = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: user.email })
-      expect(res1.statusCode).toBe(403)
-
-      await User.updateOne({ id: user._id }, { status: status.BANNED })
-      const res2 = await request(app).post(`${V1}/${BASE}/${VALIDATE_EMAIL}`).send({ email: user.email })
-      expect(res2.statusCode).toBe(403)
-    })
-
-  })
-  // * confirm account
-  // Test confirm account API
-  describe(`POST ${V1}/${BASE}/${VALIDATE_EMAIL}/t=:token .confirmAccount`, () => {
-    let inactiveUser
-    let user
-    let activateToken
-
-    beforeEach(async () => {
-      const { role, status } = await import('../../src/constants/index.mjs')
-      inactiveUser = {
-        username: faker.internet.userName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-        role: role.USER,
-        status: status.INACTIVE,
-      }
-      user = await User.create(inactiveUser)
-      activateToken = tokenService.generateValAccToken(user._id)
-      user.activateToken = activateToken
-      await user.save()
-    })
-
-    afterEach(async () => {
-      user.activateToken = undefined
-      await user.save()
-    })
-
-    it('should return 200 if status of user is inactive, token existed and valid', async () => {
-      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
-      expect(res.statusCode).toBe(200)
-    })
-
-    // TODO fast-forward time until token expired to test API
-    // it('should return 401 if token is expired', async () => {
-    //   const res = await request(app).get(`/api/v1/auth/${VALIDATE_EMAIL}/t=${activateToken}`)
-    // })
-
-    it('should return 401 if token is malformed', async () => {
-      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=malformed_token`)
-      expect(res.statusCode).toBe(401)
-    })
-
-    it('should return 403 if token not exists', async () => {
-      user.activateToken = undefined
-      await user.save()
-      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
-      expect(res.statusCode).toBe(403)
-    })
-
-    it('should return 403 if status user is active', async () => {
-      user.status = status.ACTIVE
-      await user.save()
-      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
-      expect(res.statusCode).toBe(403)
-    })
-
-    it('should return 403 if status user is banned', async () => {
-      user.status = status.BANNED
-      await user.save()
-      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=${activateToken}`)
-      expect(res.statusCode).toBe(403)
-    })
-
-    it('should return 404 if token is not provided in URL', async () => {
-      const res = await request(app).get(`${V1}/${BASE}/${VALIDATE_EMAIL}/t=`)
-      expect(res.statusCode).toBe(404)
     })
 
   })
@@ -656,5 +533,243 @@ describe('Auth routes', () => {
     //   expect(updatedUser?.resetPwToken).toBeDefined()
     // })
 
+  })
+  // * Refresh token 
+  // Test refresh token API
+  describe(`POST ${V1}/${BASE}/${REFRESH_TOKEN} .refreshToken`, () => {
+    // Arrange
+    let inactiveUser
+    beforeEach(async () => {
+      const { role, status } = await import('../../src/constants/index.mjs')
+      inactiveUser = {
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        role: role.USER,
+        status: status.INACTIVE,
+      }
+      await insertUsers([inactiveUser])
+    })
+    it('should return 201 with new access token and new refresh token', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      const { token: AT, expiresAt: ATexpires } = tokens.access
+      const { token: RT, expiresAt: RTexpires } = tokens.refresh
+
+      const { previousToken, isCurrentlyValid, user: userId } = await tokenService.getSessionByPreviousToken(RT)
+
+      expect(res.statusCode).toBe(201)
+      expect(AT).toBeDefined()
+      expect(RT).toBeDefined()
+      expect(ATexpires).toBeGreaterThan(Date.now() / 1000)
+      expect(RTexpires).toBeGreaterThan(Date.now() / 1000)
+      expect(previousToken).toBe(tokens.refresh.token)
+      expect(isCurrentlyValid).toBe(true)
+      expect(userId.toString()).toStrictEqual(user._id.toString())
+    })
+
+    it('should return 400 if user do not provide RT', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+
+      expect(res.statusCode).toBe(400)
+    })
+    it('should return 401 if user is blackisted', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+      const session = await tokenService.getSessionByToken(tokens.refresh.token)
+      session.isBlacklisted = true
+      await session.save()
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(401)
+    })
+
+    it('should return 401 if user is banned', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+      user.status = status.BANNED
+      await user.save()
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(401)
+    })
+
+    it('should return 401 if detects reuse RT of malicious user', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+          .then(async res => {
+            const { token: RT } = res.body.data.refresh
+            const res1 = await
+              request(app)
+                .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+                .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+                .send({ refresh: tokens.refresh.token })
+
+            const { previousToken, isCurrentlyValid } = await Token.findOne({ token: RT })
+
+            expect(res1.statusCode).toBe(401)
+            expect(previousToken).toBe(tokens.refresh.token)
+            expect(isCurrentlyValid).toBe(false)
+          })
+    })
+
+    it('should return 403 if legit user try to access invalidate RT', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      const AT0 = tokens.refresh.token
+      const RT0 = tokens.refresh.token
+      await tokenService.createSessionUser(RT0, user._id)
+
+      // ! Legit user with the second time RT0
+      await
+        request(app)
+          .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+          .set({ 'Authorization': `Bearer ${AT0}` })
+          .send({ refresh: RT0 })
+          .then(async res => {
+            const { token: AT1 } = res.body.data.access
+            const { token: RT1 } = res.body.data.refresh
+
+            const sess1 = await tokenService.getSessionByToken(RT1)
+            expect(sess1.previousToken === RT0).toBeTruthy()
+            expect(sess1.token === RT1).toBeTruthy()
+            expect(sess1.isCurrentlyValid).toBeTruthy()
+
+            // ! Malicious action with RT0
+            await
+              request(app)
+                .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+                .set({ 'Authorization': `Bearer ${AT0}` })
+                .send({ refresh: RT0 })
+                .then(async _res => {
+                  const sess2 = await tokenService.getSessionByToken(RT1)
+
+                  expect(sess2.previousToken === RT0).toBeTruthy()
+                  expect(sess2.token === RT1).toBeTruthy()
+                  expect(sess2.isCurrentlyValid).toBeFalsy()
+
+                  // ! Legit user try to refresh token with RT1
+                  const res1 = await
+                    request(app)
+                      .post(`${V1}/${BASE}/${REFRESH_TOKEN}`)
+                      .set({ 'Authorization': `Bearer ${AT1}` })
+                      .send({ refresh: RT1 })
+
+                  const { isCurrentlyValid, token } = await tokenService.getSessionByToken(RT1)
+
+                  expect(RT1 === token).toBeTruthy()
+                  expect(isCurrentlyValid).toBeFalsy()
+                  expect(res1.statusCode).toBe(403)
+                  expect(isCurrentlyValid).toBe(false)
+                })
+          })
+    })
+  })
+  // * Log out token 
+  // Test log out API
+  describe(`POST ${V1}/${BASE}/${LOGOUT} .logout`, () => {
+    // Arrange
+    let inactiveUser
+    beforeEach(async () => {
+      const { role, status } = await import('../../src/constants/index.mjs')
+      inactiveUser = {
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        role: role.USER,
+        status: status.INACTIVE,
+      }
+      await insertUsers([inactiveUser])
+    })
+    it('should return 200 when log out session successfully', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: tokens.refresh.token })
+
+      const session = await Token.findOne({ token: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(200)
+      expect(session).toBeNull()
+    })
+
+    it('should return 400 if user do not provide RT', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('should return 400 if user do not provide AT in header', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .send({ refresh: tokens.refresh.token })
+
+      expect(res.statusCode).toBe(400)
+    })
+
+    it('should return 404 if refresh token not found in DB', async () => {
+      const user = await userService.getUserByEmail(inactiveUser.email)
+      const tokens = tokenService.generateAuthTokens(user)
+      await tokenService.createSessionUser(tokens.refresh.token, user._id)
+
+      const res = await
+        request(app)
+          .post(`${V1}/${BASE}/${LOGOUT}`)
+          .set({ 'Authorization': `Bearer ${tokens.access.token}` })
+          .send({ refresh: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsInN0YXR1cyI6ImluYWN0aXZlIiwic3ViIjoiNjM0NzZiZGMyNWU3ZDIyZGZkZWFiMDkyIiwiaWF0IjoxNjY1NjI1MDUyLCJleHAiOjE2NjU2MjY4NTJ9.56gXOWKmEA3oaHhD_Pb_zOWfPBAlVJSsDTj_cBvIXT8' })
+
+      expect(res.statusCode).toBe(404)
+    })
   })
 })

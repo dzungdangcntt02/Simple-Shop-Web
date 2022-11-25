@@ -43,7 +43,13 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Allow CORS across-the-board
-app.use(cors())
+app.use(cors({
+  credentials: true,
+  origin: [
+    process.env.PROD_CLIENT_DOMAIN,
+    process.env?.DEV_CLIENT_DOMAIN || 'http://127.0.0.1:5173',
+  ],
+}))
 
 // gzip compression
 app.use(compression());

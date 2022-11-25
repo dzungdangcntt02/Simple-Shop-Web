@@ -3,6 +3,8 @@ import express from 'express';
 import { api } from '../../constants/index.mjs'
 import { config } from '../../validations/index.mjs';
 import authEndpoint from './auth.route.mjs'
+import sseEndpoint from './sse.route.mjs'
+import userEndpoint from './user.route.mjs'
 import docsEndpoint from './docs.route.mjs'
 
 const router = express.Router()
@@ -11,6 +13,17 @@ const publicRoutes = [
   {
     path: `/${api.ENDPOINTS.AUTH.BASE}`,
     route: authEndpoint,
+  },
+  {
+    path: `/${api.ENDPOINTS.SSE.BASE}`,
+    route: sseEndpoint,
+  },
+]
+
+const authorizedRoutes = [
+  {
+    path: `/${api.ENDPOINTS.USER.BASE}`,
+    route: userEndpoint,
   },
 ]
 
@@ -22,6 +35,9 @@ const devRoutes = [
 ]
 
 publicRoutes.forEach(route => {
+  router.use(route.path, route.route)
+})
+authorizedRoutes.forEach(route => {
   router.use(route.path, route.route)
 })
 
