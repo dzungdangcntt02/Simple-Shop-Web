@@ -252,3 +252,7 @@ export const test = catchAsync(async (req, res) => {
     user: req.user,
   })
 })
+
+export const ping = catchAsync(async (req, res) => {
+  response(res, httpStatus.OK, httpStatus[200])
+})
