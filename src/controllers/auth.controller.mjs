@@ -197,12 +197,12 @@ export const refreshToken = catchAsync(async (req, res) => {
       preCheck.isCurrentlyValid = false
       await preCheck.save()
 
-      throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token')
     }
 
     const session = await tokenService.getSessionByToken(refresh)
     if (!session) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token')
     }
 
     if (!session.isCurrentlyValid) {
@@ -210,7 +210,7 @@ export const refreshToken = catchAsync(async (req, res) => {
     }
 
     if (session.isBlacklisted || session.user.status === status.BANNED) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, httpStatus[401])
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token')
     }
 
     await tokenService.verifyToken(refresh, 'refresh', 'Expired token')
