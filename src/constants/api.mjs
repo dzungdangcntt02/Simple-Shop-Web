@@ -12,6 +12,7 @@ export const ENDPOINTS = {
     REFRESH_TOKEN: 'refresh-token',
     LOGOUT: 'sign-out',
     TEST: 'test',
+    PING: 'ping',
   },
   SSE: {
     BASE: 'sse',
