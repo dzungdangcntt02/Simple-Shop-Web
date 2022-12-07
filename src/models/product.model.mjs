@@ -64,6 +64,10 @@ const productSchema = mongoose.Schema({
     type: Number,
     min: 4,
   },
+  // Screen type of phone:
+  screenType: {
+    type: String,
+  },
   // Color of phone: unit: inch
   color: {
     type: String,
@@ -84,6 +88,7 @@ const productSchema = mongoose.Schema({
   warranty: {
     type: Number,
     min: 1,
+    required: true,
   },
   // bonus when buying phone
   bonus: {

@@ -8,7 +8,6 @@ const brandSchema = mongoose.Schema({
   // Logo of brand
   imageLogo: {
     type: String,
-    required: true,
   },
   // URL to original website of brand
   link: {
