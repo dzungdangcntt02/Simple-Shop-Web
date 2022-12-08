@@ -43,13 +43,16 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Allow CORS across-the-board
-app.use(cors({
-  credentials: true,
-  origin: [
-    process.env.PROD_CLIENT_DOMAIN,
-    process.env?.DEV_CLIENT_DOMAIN || 'http://127.0.0.1:5173',
-  ],
-}))
+// app.use(cors({
+//   credentials: true,
+//   origin: [
+//     process.env.PROD_CLIENT_DOMAIN,
+//     process.env?.DEV_CLIENT_DOMAIN || 'http://localhost:5173',
+//   ],
+// }))
+// TODO fix cors when running in dev env
+app.use(cors())
+app.options('*', cors());
 
 // gzip compression
 app.use(compression());

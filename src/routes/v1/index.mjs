@@ -6,6 +6,7 @@ import authEndpoint from './auth.route.mjs'
 import sseEndpoint from './sse.route.mjs'
 import userEndpoint from './user.route.mjs'
 import docsEndpoint from './docs.route.mjs'
+import testEndpoint from './test.route.mjs'
 
 const router = express.Router()
 
@@ -17,6 +18,10 @@ const publicRoutes = [
   {
     path: `/${api.ENDPOINTS.SSE.BASE}`,
     route: sseEndpoint,
+  },
+  {
+    path: '/test',
+    route: testEndpoint,
   },
 ]
 
