@@ -43,16 +43,17 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Allow CORS across-the-board
-// app.use(cors({
-//   credentials: true,
-//   origin: [
-//     process.env.PROD_CLIENT_DOMAIN,
-//     process.env?.DEV_CLIENT_DOMAIN || 'http://localhost:5173',
-//   ],
-// }))
-// TODO fix cors when running in dev env
-app.use(cors())
-app.options('*', cors());
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors())
+  app.options('*', cors());
+} else if (process.env.NODE_ENV === 'production') {
+  app.use(cors({
+    credentials: true,
+    origin: [
+      process.env.PROD_CLIENT_DOMAIN,
+    ],
+  }))
+}
 
 // gzip compression
 app.use(compression());
