@@ -190,24 +190,24 @@ export const refreshToken = catchAsync(async (req, res) => {
     }
 
     // Detect reuse token
-    const preCheck = await tokenService.getSessionByPreviousToken(refresh)
-    if (preCheck) {
-      if (process.env.NODE_ENV !== 'test') logger.warn('Malicious action detected!')
+    // const preCheck = await tokenService.getSessionByPreviousToken(refresh)
+    // if (preCheck) {
+    //   if (process.env.NODE_ENV !== 'test') logger.warn('Malicious action detected!')
 
-      preCheck.isCurrentlyValid = false
-      await preCheck.save()
+    //   preCheck.isCurrentlyValid = false
+    //   await preCheck.save()
 
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Detected malicious token')
-    }
+    //   throw new ApiError(httpStatus.UNAUTHORIZED, 'Detected malicious token')
+    // }
 
     const session = await tokenService.getSessionByToken(refresh)
     if (!session) {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token')
     }
 
-    if (!session.isCurrentlyValid) {
-      throw new ApiError(httpStatus.FORBIDDEN, 'Malicious action detected! Please authenticate your account!')
-    }
+    // if (!session.isCurrentlyValid) {
+    //   throw new ApiError(httpStatus.FORBIDDEN, 'Malicious action detected! Please authenticate your account!')
+    // }
 
     if (session.isBlacklisted || session.user.status === status.BANNED) {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token')
