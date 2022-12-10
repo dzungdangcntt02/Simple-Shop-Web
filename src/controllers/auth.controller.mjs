@@ -197,7 +197,7 @@ export const refreshToken = catchAsync(async (req, res) => {
       preCheck.isCurrentlyValid = false
       await preCheck.save()
 
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token')
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Detected malicious token')
     }
 
     const session = await tokenService.getSessionByToken(refresh)

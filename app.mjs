@@ -43,13 +43,17 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Allow CORS across-the-board
-app.use(cors({
-  credentials: true,
-  origin: [
-    process.env.PROD_CLIENT_DOMAIN,
-    process.env?.DEV_CLIENT_DOMAIN || 'http://127.0.0.1:5173',
-  ],
-}))
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors())
+  app.options('*', cors());
+} else if (process.env.NODE_ENV === 'production') {
+  app.use(cors({
+    credentials: true,
+    origin: [
+      process.env.PROD_CLIENT_DOMAIN,
+    ],
+  }))
+}
 
 // gzip compression
 app.use(compression());
@@ -61,10 +65,10 @@ app.use(helmet())
 app.use(mongoSanitize())
 
 // Only accept json data
-app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
 
 // Parse data with URL-encoded like JSON
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 
 app.use('/api/v1', routes)
 
