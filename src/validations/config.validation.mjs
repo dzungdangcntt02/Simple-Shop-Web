@@ -31,6 +31,9 @@ const envVarsSchema = Joi.object()
     PROD_MAIL_USERNAME: Joi.string().description('username for email server'),
     PROD_MAIL_PASSWORD: Joi.string().description('password for email server'),
     CLIENT_JWT_RESET_PW_TOKEN: Joi.string().required().description('JWT in client-side to identify reset password request of user'),
+    CLOUD_NAME: Joi.string().description('cloud name'),
+    API_KEY: Joi.string().description('api key for cloudinary'),
+    API_SECRET: Joi.string().description('api secret for cloudinary'),
   })
   .unknown()
 
@@ -53,6 +56,9 @@ export const mailSender = envVars.SENDGRID_SENDER
 export const dbName = envVars.DB_NAME
 export const nodeEnv = envVars.NODE_ENV
 export const port = envVars.PORT
+export const cloudName = envVars.CLOUD_NAME
+export const apiKey = envVars.API_KEY
+export const apiSecret = envVars.API_SECRET
 export const host = envVars.HOST
 export const email = (nodeEnv === 'development' || nodeEnv === 'test')
   ? {
