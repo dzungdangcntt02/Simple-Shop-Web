@@ -22,7 +22,6 @@ import {
 import ApiError from '../helpers/ApiError.mjs'
 import { config } from '../validations/index.mjs'
 import { stringToDate } from '../common/toDate.mjs'
-import logger from '../config/logger.mjs'
 
 export const register = catchAsync(async (req, res) => {
   const doc = pick(req.body, ['username', 'email', 'password'])
