@@ -20,7 +20,7 @@ const router = express.Router()
 router.get(`/${GET_PRODUCTS}`, productController.getProducts)
 router.get(`/${GET_PRODUCT}`, productController.getProduct)
 router.post(`/${CREATE_PRODUCT}`, verifyUser(permissions.PRODUCT.CREATE_PRODUCT), productController.createProduct)
-router.put(`/${UPDATE_PRODUCT}`, verifyUser(permissions.PRODUCT.UPDATE_PRODUCT), productController.updateProduct)
+router.patch(`/${UPDATE_PRODUCT}`, verifyUser(permissions.PRODUCT.UPDATE_PRODUCT), productController.updateProduct)
 router.delete(`/${DELETE_PRODUCT}`, verifyUser(permissions.PRODUCT.DELETE_PRODUCT), productController.deleteProduct)
 
 export default router
