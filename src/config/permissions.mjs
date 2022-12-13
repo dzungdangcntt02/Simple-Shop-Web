@@ -33,7 +33,7 @@ export const permissions = {
     UPDATE_TRANSACTIONS: 'update_transactions', // Admin right
   },
   BRAND: {
-    GET_BRAND: 'get_brand', // User & Admin right
+    GET_BRAND: 'get_brand', // Admin right
     GET_BRANDS: 'get_brands', // Admin right
     CREATE_BRAND: 'create_brand', // Admin right
     UPDATE_BRAND: 'update_brand', // Admin right
@@ -42,7 +42,7 @@ export const permissions = {
     DELETE_BRANDS: 'delete_brands', // Admin right
   },
   CATALOG: {
-    GET_CATALOG: 'get_catalog', // User & Admin right
+    GET_CATALOG: 'get_catalog', // Admin right
     GET_CATALOGS: 'get_catalogs', // Admin right
     CREATE_CATALOG: 'create_catalog', // Admin right
     UPDATE_CATALOG: 'update_catalog', // Admin right

@@ -104,6 +104,9 @@ export const deleteProduct = catchAsync(async (req, res) => {
 
   try {
     const prod = await productService.deleteProductById(id)
+    if (!prod) {
+      return response(res, httpStatus.NO_CONTENT, httpStatus[204])
+    }
 
     response(res, httpStatus.OK, httpStatus[200], prod)
   } catch (err) {

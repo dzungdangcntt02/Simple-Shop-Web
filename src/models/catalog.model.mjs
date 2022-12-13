@@ -8,7 +8,6 @@ const catalogSchema = mongoose.Schema({
   parentId: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Catalog',
-    required: true,
   },
 }, {
   timestamps: true,
