@@ -1,6 +1,5 @@
 /* eslint-disable */
 import mongoose from 'mongoose'
-import _colors from 'colors'
 
 import { adminRole, userRole } from '../../src/config/setup.mjs'
 import { Role } from '../../src/models/role.model.mjs'

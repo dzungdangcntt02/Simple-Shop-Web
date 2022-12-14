@@ -30,7 +30,6 @@
     "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.32.0",
-    "colors": "^1.4.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "express": "^4.18.1",

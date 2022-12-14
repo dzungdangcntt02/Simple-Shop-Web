@@ -1,6 +1,4 @@
 import httpStatus from 'http-status'
-// eslint-disable-next-line no-unused-vars
-import colors from 'colors'
 
 import logger from '../config/logger.mjs'
 import { config } from '../validations/index.mjs'
@@ -35,7 +33,7 @@ export const errorResponseSpecification = (err, res, codeArr = []) => {
   }
   if (config.nodeEnv === 'test' || process.env.NODE_ENV === 'test') {
     // eslint-disable-next-line no-console
-    // console.log(colors.blue(err.message))
+    // console.log(err.message)
   }
 
   if (codeArr && codeArr.includes(statusCode)) {
