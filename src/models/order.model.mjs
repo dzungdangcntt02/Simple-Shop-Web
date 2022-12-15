@@ -8,19 +8,17 @@ const orderSchema = mongoose.Schema({
     enum: Object.values(orderStatus),
     default: orderStatus.NOT_DELIVERED,
   },
-  quantity: {
+  // Giá tiền món hàng được mua khi đặt đơn khi đó
+  price: {
     type: Number,
     required: true,
     min: 1,
   },
+  // Số lượng món hàng khi đặt đơn khi đó
   amount: {
     type: Number,
     required: true,
     min: 1,
-  },
-  note: {
-    type: String,
-    maxLength: 255,
   },
   transactionId: {
     type: mongoose.SchemaTypes.ObjectId,
@@ -31,6 +29,10 @@ const orderSchema = mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Product',
     required: true,
+  },
+  note: {
+    type: String,
+    maxLength: 255,
   },
 }, {
   timestamps: true,

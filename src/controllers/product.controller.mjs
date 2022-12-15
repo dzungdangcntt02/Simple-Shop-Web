@@ -113,3 +113,15 @@ export const deleteProduct = catchAsync(async (req, res) => {
     errorResponseSpecification(err, res)
   }
 })
+
+export const getShortProductList = catchAsync(async (req, res) => {
+  const idList = (req.body?.idList) ? { _id: req.body?.idList } : {}
+
+  try {
+    const products = await productService.getProductsWithProjection(idList, 'name price imageLink discount color ram rom battery')
+
+    response(res, httpStatus.OK, httpStatus[200], products)
+  } catch (err) {
+    errorResponseSpecification(err, res)
+  }
+})
