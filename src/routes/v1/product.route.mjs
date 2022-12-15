@@ -15,12 +15,18 @@ const {
   DELETE_PRODUCT,
 } = api.ENDPOINTS.PRODUCT
 
+const { ADMIN, CLIENT } = api.ENDPOINTS
+
 const router = express.Router()
 
-router.get(`/${GET_PRODUCTS}`, productController.getProducts)
-router.get(`/${GET_PRODUCT}`, productController.getProduct)
-router.post(`/${CREATE_PRODUCT}`, verifyUser(permissions.PRODUCT.CREATE_PRODUCT), productController.createProduct)
-router.patch(`/${UPDATE_PRODUCT}`, verifyUser(permissions.PRODUCT.UPDATE_PRODUCT), productController.updateProduct)
-router.delete(`/${DELETE_PRODUCT}`, verifyUser(permissions.PRODUCT.DELETE_PRODUCT), productController.deleteProduct)
+router.get(`/${ADMIN}/${GET_PRODUCT}`, verifyUser(permissions.PRODUCT.GET_PRODUCT), productController.getProduct)
+router.get(`/${ADMIN}/${GET_PRODUCTS}`, verifyUser(permissions.PRODUCT.GET_PRODUCTS), productController.getProducts)
+router.post(`/${ADMIN}/${CREATE_PRODUCT}`, verifyUser(permissions.PRODUCT.CREATE_PRODUCT), productController.createProduct)
+router.patch(`/${ADMIN}/${UPDATE_PRODUCT}`, verifyUser(permissions.PRODUCT.UPDATE_PRODUCT), productController.updateProduct)
+router.delete(`/${ADMIN}/${DELETE_PRODUCT}`, verifyUser(permissions.PRODUCT.DELETE_PRODUCT), productController.deleteProduct)
+
+router.get(`/${CLIENT}/${GET_PRODUCTS}`, productController.getShortProductList)
+router.post(`/${CLIENT}/${GET_PRODUCTS}`, productController.getShortProductList)
+router.get(`/${CLIENT}/${GET_PRODUCT}`, productController.getProduct)
 
 export default router

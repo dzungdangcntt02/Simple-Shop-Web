@@ -1,6 +1,8 @@
 export const V1 = '/api/v1'
 
 export const ENDPOINTS = {
+  ADMIN: 'admin',
+  CLIENT: 'client',
   AUTH: {
     BASE: 'auth',
     REGISTER: 'register',
