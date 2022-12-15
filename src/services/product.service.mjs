@@ -98,3 +98,8 @@ export const deleteProductById = async id => {
 
   return prod
 }
+
+// eslint-disable-next-line arrow-body-style
+export const getProductsWithProjection = async (filter, projection) => {
+  return Product.find(filter, projection)
+}
