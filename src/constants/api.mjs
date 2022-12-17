@@ -31,6 +31,7 @@ export const ENDPOINTS = {
     CREATE_PRODUCT: '',
     UPDATE_PRODUCT: ':id',
     DELETE_PRODUCT: ':id',
+    CHECK_PRODUCT_ORDER_CONDITION: 'check',
   },
   BRAND: {
     BASE: 'brand',
@@ -47,6 +48,10 @@ export const ENDPOINTS = {
     CREATE_CATALOG: '',
     UPDATE_CATALOG: ':id',
     DETELE_CATALOG: ':id',
+  },
+  TRANSACTION: {
+    BASE: 'checkout',
+    CREATE_TRANSACTION: '',
   },
   DOCS: {
     BASE: 'docs',

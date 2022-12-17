@@ -1,4 +1,5 @@
 import httpStatus from 'http-status'
+import mongoose from 'mongoose'
 import logger from '../config/logger.mjs'
 import ApiError from '../helpers/ApiError.mjs'
 import { Product } from '../models/index.mjs'
@@ -102,4 +103,13 @@ export const deleteProductById = async id => {
 // eslint-disable-next-line arrow-body-style
 export const getProductsWithProjection = async (filter, projection) => {
   return Product.find(filter, projection)
+}
+
+export const getProductsByIds = async (cart, projection = '') => {
+  const idObjectArray = cart.map(item => mongoose.Types.ObjectId(item.id))
+  return Product.find({
+    _id: {
+      $in: idObjectArray,
+    },
+  }, projection)
 }

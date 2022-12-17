@@ -1,12 +1,13 @@
 import mongoose from 'mongoose'
 
-import { transactionStatus } from '../constants/index.mjs'
+import { NOT_PAID, PAID } from '../constants/transaction.mjs'
 
 const transactionSchema = mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: Object.values(transactionStatus),
+    enum: [NOT_PAID, PAID],
+    default: NOT_PAID,
   },
   username: {
     type: String,
@@ -20,6 +21,11 @@ const transactionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  userAddress: {
+    type: String,
+    required: true,
+    maxLength: 512,
+  },
   totalAmount: {
     type: Number,
     required: true,
@@ -29,6 +35,16 @@ const transactionSchema = mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'User',
     default: null,
+  },
+  note: {
+    type: String,
+    maxLength: 512,
+  },
+  // Automatically add to transaction totalAmount
+  shipCost: {
+    type: Number,
+    min: 0,
+    default: 30000,
   },
 }, {
   timestamps: true,
