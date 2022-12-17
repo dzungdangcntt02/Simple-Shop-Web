@@ -13,6 +13,7 @@ const {
   CREATE_PRODUCT,
   UPDATE_PRODUCT,
   DELETE_PRODUCT,
+  CHECK_PRODUCT_ORDER_CONDITION,
 } = api.ENDPOINTS.PRODUCT
 
 const { ADMIN, CLIENT } = api.ENDPOINTS
@@ -28,5 +29,6 @@ router.delete(`/${ADMIN}/${DELETE_PRODUCT}`, verifyUser(permissions.PRODUCT.DELE
 router.get(`/${CLIENT}/${GET_PRODUCTS}`, productController.getShortProductList)
 router.post(`/${CLIENT}/${GET_PRODUCTS}`, productController.getShortProductList)
 router.get(`/${CLIENT}/${GET_PRODUCT}`, productController.getProduct)
+router.post(`/${CLIENT}/${CHECK_PRODUCT_ORDER_CONDITION}`, productController.checkProductOrderCondition)
 
 export default router

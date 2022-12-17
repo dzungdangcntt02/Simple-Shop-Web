@@ -2,15 +2,13 @@
 import express from 'express'
 
 import { authController } from '../../controllers/index.mjs'
-import { validate, verifyUser } from '../../middlewares/index.mjs'
+import { validate } from '../../middlewares/index.mjs'
 import { auth } from '../../validations/index.mjs'
 import { api } from '../../constants/index.mjs'
-import { permissions } from '../../config/permissions.mjs'
 
 const {
   LOGIN,
   REGISTER,
-  TEST,
   FIND_ACCOUNT,
   RESETPW_EMAIL,
   VALIDATE_PWCODE,
@@ -30,9 +28,5 @@ router.post(`/${RESET_PASSWORD}`, validate(auth.resetPassword), authController.r
 router.post(`/${REFRESH_TOKEN}`, validate(auth.refreshToken), authController.refreshToken)
 router.post(`/${LOGOUT}`, validate(auth.logout), authController.logout)
 router.get(`/${PING}`, authController.ping)
-
-router.post(`/${TEST}`, verifyUser(permissions.USER.CREATE_USER), authController.test)
-router.post(`/${TEST}/:userId`, verifyUser(permissions.USER.READ_USER), authController.test)
-router.post(`/${TEST}/:userId`, verifyUser(permissions.USER.READ_USER, permissions.USER.UPDATE_USER), authController.test)
 
 export default router

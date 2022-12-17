@@ -1,8 +1,6 @@
 export * as role from './role.mjs'
 export * as api from './api.mjs'
 export * from './user.mjs'
-export * from './mail.mjs'
 export * from './otp.mjs'
 export * from './auth.mjs'
 export * as transactionStatus from './transaction.mjs'
-export * as orderStatus from './order.mjs'

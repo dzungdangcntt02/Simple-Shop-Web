@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable import/prefer-default-export */
 import httpStatus from 'http-status'
 import catchAsync from '../helpers/catchAsync.mjs'
@@ -121,6 +122,30 @@ export const getShortProductList = catchAsync(async (req, res) => {
     const products = await productService.getProductsWithProjection(idList, 'name price imageLink discount color ram rom battery')
 
     response(res, httpStatus.OK, httpStatus[200], products)
+  } catch (err) {
+    errorResponseSpecification(err, res)
+  }
+})
+
+export const checkProductOrderCondition = catchAsync(async (req, res) => {
+  const { cart } = req.body
+  const condition = []
+  try {
+    const products = await productService.getProductsByIds(cart, 'quantity name')
+    for (const product of products) {
+      for (const item of cart) {
+        if (product._id.toString() === item.id) {
+          const result = {
+            id: product._id.toString(),
+            name: product.name,
+            isEnoughAmount: !((product.quantity < item.amount)),
+          }
+          condition.push(result)
+        }
+      }
+    }
+
+    response(res, httpStatus.OK, httpStatus[200], condition)
   } catch (err) {
     errorResponseSpecification(err, res)
   }

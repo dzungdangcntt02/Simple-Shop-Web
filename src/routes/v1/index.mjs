@@ -9,6 +9,7 @@ import docsEndpoint from './docs.route.mjs'
 import testEndpoint from './test.route.mjs'
 import brandEndpoint from './brand.route.mjs'
 import catalogEndpoint from './catalog.route.mjs'
+import transactionEndpoint from './transaction.route.mjs'
 // import orderEndpoint from './order.route.mjs'
 import productEndpoint from './product.route.mjs'
 
@@ -29,7 +30,7 @@ const publicRoutes = [
   },
 ]
 
-const authorizedRoutes = [
+const defaultRoutes = [
   {
     path: `/${api.ENDPOINTS.USER.BASE}`,
     route: userEndpoint,
@@ -46,6 +47,10 @@ const authorizedRoutes = [
     path: `/${api.ENDPOINTS.CATALOG.BASE}`,
     route: catalogEndpoint,
   },
+  {
+    path: `/${api.ENDPOINTS.TRANSACTION.BASE}`,
+    route: transactionEndpoint,
+  },
 ]
 
 const devRoutes = [
@@ -58,7 +63,7 @@ const devRoutes = [
 publicRoutes.forEach(route => {
   router.use(route.path, route.route)
 })
-authorizedRoutes.forEach(route => {
+defaultRoutes.forEach(route => {
   router.use(route.path, route.route)
 })
 
