@@ -15,10 +15,10 @@ import sanitize from '../helpers/sanitizeDocument.mjs'
 import { errorResponseSpecification } from '../helpers/errorResponse.mjs'
 import {
   status,
-  resetPw,
   expireOTP,
   LIMIT_RP_REQUEST,
 } from '../constants/index.mjs'
+import { resetPw } from '../constants/mail.mjs'
 import ApiError from '../helpers/ApiError.mjs'
 import { config } from '../validations/index.mjs'
 import { stringToDate } from '../common/toDate.mjs'
@@ -244,12 +244,6 @@ export const logout = catchAsync(async (req, res) => {
   } catch (err) {
     return errorResponseSpecification(err, res, [httpStatus.BAD_REQUEST, httpStatus.NOT_FOUND])
   }
-})
-
-export const test = catchAsync(async (req, res) => {
-  response(res, httpStatus.OK, httpStatus[200], {
-    user: req.user,
-  })
 })
 
 export const ping = catchAsync(async (req, res) => {
