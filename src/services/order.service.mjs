@@ -32,4 +32,4 @@ export const generateOrder = async (data) => {
 
 export const createOrders = async (orderList) => Order.create(orderList)
 
-// export const getOrderById = async (id) => 
+export const getOrderByTransactionId = async (id) => Order.find({ transactionId: id }).populate('productId', 'imageLink name')

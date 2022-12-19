@@ -52,6 +52,9 @@ export const ENDPOINTS = {
   TRANSACTION: {
     BASE: 'checkout',
     CREATE_TRANSACTION: '',
+    GET_TRANSACTIONS: '',
+    GET_TRANSACTION: ':id',
+    UPDATE_TRANSACTION: ':id',
   },
   DOCS: {
     BASE: 'docs',

@@ -1,12 +1,12 @@
 import mongoose from 'mongoose'
 
-import { NOT_PAID, PAID } from '../constants/transaction.mjs'
+import { CANCELED, NOT_PAID, PAID } from '../constants/transaction.mjs'
 
 const transactionSchema = mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: [NOT_PAID, PAID],
+    enum: [NOT_PAID, PAID, CANCELED],
     default: NOT_PAID,
   },
   username: {
