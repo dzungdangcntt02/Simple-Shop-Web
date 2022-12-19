@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 
 import ApiError from '../helpers/ApiError.mjs'
 import { User } from '../models/user.model.mjs'
+import { USER } from '../constants/role.mjs'
 
 export const hashPassword = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10))
 
@@ -40,10 +41,10 @@ export const getUserById = async id => User.findById(id)
 
 /**
  * @param {string} id objectId
- * @param {object} filters fields to update
+ * @param {object} update fields to update
  * @returns {object<mongoose>} result
  */
-export const updateUserById = async (id, filters) => User.findByIdAndUpdate(id, filters)
+export const updateUserById = async (id, update) => User.findByIdAndUpdate(id, update)
 
 /**
  * Check if a password is valid or not
@@ -53,4 +54,13 @@ export const updateUserById = async (id, filters) => User.findByIdAndUpdate(id, 
  */
 export const isPasswordMatch = (user, password) => comparePassword(password, user.password)
 
+export const getAllClient = async () => User.find(
+  { role: USER },
+  'username email phoneNumber gender status createdAt updatedAt address',
+).lean()
+
+export const getClientById = async id => User.findById(id, 'username email phoneNumber gender status createdAt updatedAt address').lean()
+
 export const getUserByEmail = async email => User.findOne({ email })
+
+export const deleteCLientById = async id => User.findByIdAndDelete(id)
