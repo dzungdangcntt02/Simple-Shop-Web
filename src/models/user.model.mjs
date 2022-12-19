@@ -49,7 +49,7 @@ const userSchema = mongoose.Schema({
   },
   status: {
     type: String,
-    default: 'inactive',
+    default: 'active',
     enum: Object.values(status),
   },
   // Created when user validates account
