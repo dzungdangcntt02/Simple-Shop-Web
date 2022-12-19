@@ -3,7 +3,6 @@ import ApiError from '../helpers/ApiError.mjs'
 import { Transaction } from '../models/index.mjs'
 import { createOrders, generateOrder } from './order.service.mjs'
 
-// eslint-disable-next-line import/prefer-default-export
 export const checkoutGuestUser = async (data) => {
   const { cart, userId, ...info } = data
 
@@ -22,3 +21,10 @@ export const checkoutGuestUser = async (data) => {
     throw new ApiError(httpStatus.BAD_REQUEST, err?.message)
   }
 }
+
+// eslint-disable-next-line max-len
+export const getAllTransaction = async (projection, filter = {}) => Transaction.find(filter, projection)
+
+export const getTransactionById = async id => Transaction.findById(id).populate('userId')
+
+export const updateTransactionById = async (id, status) => Transaction.findByIdAndUpdate(id, { status: status.toString() }, { returnDocument: 'after', lean: true })

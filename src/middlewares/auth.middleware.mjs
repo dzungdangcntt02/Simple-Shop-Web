@@ -14,7 +14,7 @@ export const verifyUser = (...requiredRights) => async (req, _res, next) => {
 
     // Detach token from authHeader
     const token = authHeader.split(' ')[1]
-    const { role, status, sub: id } = tokenService.verifyToken(token, 'access', 'Invalid token')
+    const { role, status, sub: id } = tokenService.verifyToken(token, 'access')
 
     if (status === STATUS.BANNED) {
       throw new ApiError(httpStatus.FORBIDDEN, httpStatus[403])

@@ -201,7 +201,7 @@ export const refreshToken = catchAsync(async (req, res) => {
 
     const session = await tokenService.getSessionByToken(refresh)
     if (!session) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token')
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Token not found')
     }
 
     // if (!session.isCurrentlyValid) {
