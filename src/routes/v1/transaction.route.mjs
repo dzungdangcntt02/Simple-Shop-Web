@@ -21,7 +21,6 @@ const router = express.Router()
 router.get(`/${ADMIN}/${GET_TRANSACTION}`, verifyUser(permissions.TRANSACTION.GET_TRANSACTION), transactionController.getTransaction)
 router.get(`/${ADMIN}/${GET_TRANSACTIONS}`, verifyUser(permissions.TRANSACTION.GET_TRANSACTIONS), transactionController.getTransactions)
 router.patch(`/${ADMIN}/${UPDATE_TRANSACTION}`, verifyUser(permissions.TRANSACTION.UPDATE_TRANSACTION), transactionController.updateTransaction)
-// router.delete(`/${ADMIN}/${DELETE_PRODUCT}`, verifyUser(permissions.TRANSACTION.DELETE_PRODUCT), transactionController.deleteProduct)
 
 router.post(`/${CLIENT}/${CREATE_TRANSACTION}`, transactionController.createTransaction)
 

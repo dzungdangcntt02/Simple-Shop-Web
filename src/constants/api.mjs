@@ -23,6 +23,11 @@ export const ENDPOINTS = {
   USER: {
     BASE: 'user',
     VALIDATE_EMAIL: 'confirm-email',
+    GET_CLIENTS: '',
+    GET_CLIENT: ':id',
+    CREATE_CLIENT: '',
+    UPDATE_CLIENT: ':id',
+    DELETE_CLIENT: ':id',
   },
   PRODUCT: {
     BASE: 'product',
