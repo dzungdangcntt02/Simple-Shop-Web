@@ -94,7 +94,6 @@ export const sendResetPwMail = catchAsync(async (req, res) => {
     user.resetPwIssued = Date.now()
 
     await user.save()
-    await emailService.sendEmail(user.email, resetPw(otp))
 
     // Token expires in 30 mins
     const clientToken = tokenService.generateToken({ sub: user._id }, config.clientRPTokenKey, { expiresIn: 30 * 60 })
@@ -102,6 +101,7 @@ export const sendResetPwMail = catchAsync(async (req, res) => {
     response(res, httpStatus.OK, httpStatus[200], {
       token: clientToken,
     })
+    await emailService.sendEmail(user.email, resetPw(otp))
   } catch (err) {
     errorResponseSpecification(err, res, [httpStatus.UNAUTHORIZED, httpStatus.FORBIDDEN])
   }
